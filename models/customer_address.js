@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   customer_address.init({
-    cusId: {
+    customerId: {
       allowNull: false,
       primaryKey: true,
       type: DataTypes.UUID,
@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       onDelete: 'CASCADE',
     },
-    addrId: {
+    addressId: {
       allowNull: false,
       primaryKey: true,
 

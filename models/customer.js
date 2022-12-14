@@ -10,13 +10,20 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsToMany(models.address,{ through: models.customer_address })
-      this.belongsToMany(models.product,{ through: models.cart })
-      this.belongsToMany(models.product,{ through: models.order })
+      this.belongsToMany(models.address, { through: models.customer_address })
+      this.belongsToMany(models.product, { through: models.cart })
+      this.belongsToMany(models.product, { through: models.order })
       this.hasOne(models.table_booking)
     }
   }
   customer.init({
+    cus_id: {
+      allowNull: false,
+      autoIncrement: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     first_name: {
       type: DataTypes.STRING,
       allowNull: false
