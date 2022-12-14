@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   address.init({
-    addr_id: {
+    id: {
       type: DataTypes.UUID,
       primaryKey: true,
       defaultValue: DataTypes.UUIDV4,

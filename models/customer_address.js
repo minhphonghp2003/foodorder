@@ -10,33 +10,19 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.address, { foreignKey: "addrId" })
-      this.belongsTo(models.customer, { foreignKey: "cusId" })
+    
     }
   }
   customer_address.init({
     customerId: {
       allowNull: false,
-      primaryKey: true,
       type: DataTypes.UUID,
-      references: {
-        model: 'customers', // name of Target model
-        key: 'cus_id', // key in Target model that we're referencing
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+      
     },
     addressId: {
       allowNull: false,
-      primaryKey: true,
-
       type: DataTypes.UUID,
-      references: {
-        model: 'addresses', // name of Target model
-        key: 'addr_id', // key in Target model that we're referencing
-      },
-      onUpdate: 'CASCADE',
-      onDelete: 'CASCADE',
+     
     },
     default: {
       type: DataTypes.INTEGER,

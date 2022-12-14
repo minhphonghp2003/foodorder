@@ -14,11 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   category.init({
+   
     name: {
-        type: DataTypes.STRING,
-        unique:true,
-        allowNull: false
-      }
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'category',

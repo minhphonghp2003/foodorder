@@ -14,20 +14,31 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   table_booking.init({
+    tab_id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
     date: {
-        allowNull:false,
-        type: DataTypes.TEXT
-      },
+      allowNull: false,
+      type: DataTypes.TEXT
+    },
 
     time: {
-        allowNull:false,
-        type: DataTypes.TEXT
-      },
+      allowNull: false,
+      type: DataTypes.TEXT
+    },
 
     message: {
-        allowNull:false,
-        type: DataTypes.TEXT
-      },
+      allowNull: false,
+      type: DataTypes.TEXT
+    },
+    customerId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+      
+    },
 
   }, {
     sequelize,

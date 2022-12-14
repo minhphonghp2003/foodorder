@@ -11,12 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.belongsTo(models.category)
-      this.belongsToMany(models.image,{through:models.product_image})
-      this.belongsToMany(models.customer,{through:models.cart})
-      this.belongsToMany(models.customer,{through:models.order})
+      this.belongsToMany(models.image, { through: models.product_image })
+      this.belongsToMany(models.customer, { through: models.cart })
+      this.belongsToMany(models.customer, { through: models.order })
     }
   }
   product.init({
+    id: {
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     name: {
       type: DataTypes.STRING,
       allowNull: false
@@ -30,7 +35,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
 
-    description:{
+    description: {
       type: DataTypes.TEXT,
       allowNull: false
     },

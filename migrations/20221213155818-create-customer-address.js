@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 1,
       },
-      cusId: {
+      customerId: {
         allowNull: false,
         autoIncrement: false,
         primaryKey: true,
@@ -21,7 +21,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
 
-      addrId: {
+      addressId: {
         allowNull: false,
         autoIncrement: false,
         primaryKey: true,
