@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.hasOne(models.table_booking)
       this.belongsToMany(models.address,{ through: models.customer_address })
+      this.hasMany(models.customer_address)
     }
   }
   customer.init({
