@@ -1,15 +1,12 @@
 const {category,product, cart,address, customer, customer_address, table_booking } = require('./models')
 const { signToken, verifyToken } = require("./library/jwt.js")
-try {
-    const token = signToken({ userId: 1 })
-    console.log({ token })
+// try {
+//         let cus = await customer.findOne({ where: { username: "A" } });
+//         console.log(cus);
     
-    const verified = verifyToken(token)
-    console.log({ verified }) 
-    
-} catch (error) {
-   console.log(error); 
-}
+// } catch (error) {
+//    console.log(error); 
+// }
 // let main = async () => {
 //     try {
 //         let addr_obj = {
@@ -53,8 +50,9 @@ try {
 //         // await product.create(prod)
 //         // let c = await customer_address.create(cus_addr)
 //         let c = await customer.findAll({include:[address,customer_address]})
+//         let cus = await customer.findOne({ where: { username: "A" } });
 //         // let c = await customer_address.findAll({include:[customer]})
-//         console.log(c);    
+//         console.log(cus);    
 //         // let p = await product.findAll({include:[category]});
 //         // console.log(p);
 // // ----------------------------------------------------------------------------
@@ -70,3 +68,5 @@ try {
 // }
 
 // main()
+let isValid = verifyToken("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjkwNWYyNGFiLTgxN2QtNGVkNi1iMGM4LTU0ZjQ5MWYwOWIyNCIsInVzZXJuYW1lIjoiQSIsImlhdCI6MTY3MTE3ODg3M30.diOlEtlscH1Fboa_lI-LgVZAsjOLslIO6uV8lAwBMLi6T4JS-U_MgcP6zTxHIDVbdcyqYzYpkqIjaoK-ohSC3RG3XgxMOR5j5wIN8Licp2AxT9SwQk0dJ1gPXrITcMjchNRiqoPKdXxjryKQwR36ozFfg6FvCeChcuwPq-UhKsQ")
+console.log(isValid);

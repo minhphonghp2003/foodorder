@@ -3,15 +3,15 @@ const fs = require('fs')
 const path = require('path')
 const jwt = require('jsonwebtoken')
 
-const privateKey = fs.readFileSync(path.join( jwtConf.keyFolder, 'rsa.key'), 'utf8')
-const publicKey = fs.readFileSync(path.join( jwtConf.keyFolder, 'rsa.pub.pem'), 'utf8')
+const privateKey = fs.readFileSync(path.join( jwtConf.keyFolder, 'rsa.key'))
+const publicKey = fs.readFileSync(path.join( jwtConf.keyFolder, 'rsa.pub.pem'))
 
 
 module.exports = {
 
     signToken: (payload) => {
         try {
-            return jwt.sign(payload, privateKey, { algorithm: 'RS256'});
+            return jwt.sign(payload, privateKey, { algorithm: 'RS256'},{ expiresIn: '1h' });
         } catch (err) {
             
             throw new Error(err)
