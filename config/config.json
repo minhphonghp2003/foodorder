@@ -1,3 +1,4 @@
+
 {
   "development": {
     "username": "postgres",
@@ -14,10 +15,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "bbgoeoxh",
+    "password": "ZKrgm-B4VSBt92fpVrBrZ0UtJok8wbQx",
+    "database": "bbgoeoxh",
+    "host": "tiny.db.elephantsql.com",
+    "dialect": "postgres"
   }
 }
