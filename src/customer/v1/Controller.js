@@ -44,7 +44,6 @@ exports.default = {
            let {password} = req.body 
            delete req.body.password
            let field = req.body
-           console.log(password,field);
            await svc.changePasswordBy(field,password)
            return res.status(200).json("Done")
         } catch (error) {
