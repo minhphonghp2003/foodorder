@@ -39,14 +39,81 @@ exports.default = {
         }
     },
 
-    changePassword: async(req,res,next) =>{
+    changePassword: async (req, res, next) => {
         try {
-           let {password} = req.body 
-           delete req.body.password
-           let field = req.body
-           await svc.changePasswordBy(field,password)
-           return res.status(200).json("Done")
+            let { password } = req.body;
+            delete req.body.password;
+            let field = req.body;
+            //    field: email/id
+            await svc.changePasswordBy(field, password);
+            return res.status(200).json("Done");
         } catch (error) {
+            next(error);
+        }
+    },
+
+    getProfile: async (req, res, next) => {
+        try {
+            let id = req.authData.id;
+            let customer = await svc.getProfile(id);
+            return res.status(200).json(customer);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    changeProfile: async (req, res, next) => {
+        try {
+            let id = req.authData.id;
+            let field = req.body;
+            await svc.changeProfile(field, id);
+            return res.status(200).json("done");
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    getCustomerAddress: async (req, res, next) => {
+        try {
+            let cid = req.authData.id;
+            let address = await svc.getCustomerAddress(cid);
+            return res.status(200).json(address);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    createCustomerAddress: async(req,res,next) =>{
+        try {
+           let customerId = req.authData.id 
+           let addressDetail = req.body
+           let cus_addr = await svc.createCustomerAddress(customerId,addressDetail)
+           return res.status(200).json(cus_addr)
+        } catch (error) {
+           next(error) 
+        }
+    },
+
+    changeDefaultAddress: async(req,res,next) =>{
+        try {
+           let customerId = req.authData.id 
+           let addressId = req.body.address
+           await svc.changeDefaultAddress(customerId,addressId)
+           return res.status(200).json("done")
+        } catch (error) {
+           next(error) 
+        }
+    },
+
+    changeAddressDetail: async(req,res,next) =>{
+        try {
+            let {id} = req.body
+            delete req.body.id 
+            let addressDetail = req.body
+            await svc.changeAddressDetail(id,addressDetail) 
+            return res.status(200).json("DONE")
+        } catch (error) {
+            console.log(error);
            next(error) 
         }
     }
