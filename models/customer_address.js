@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   customer_address.init({
-    customerId: {
+    userId: {
       allowNull: false,
       type: DataTypes.UUID,
       

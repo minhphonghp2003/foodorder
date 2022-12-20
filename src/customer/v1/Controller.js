@@ -3,13 +3,14 @@ exports.default = {
     login: async (req, res, next) => {
         try {
             let credential = req.body;
-            let customer = await svc.getValidCustomer(credential);
+            let user = await svc.getValidCustomer(credential);
             let token = svc.getLoginToken({
-                id: customer.id,
-                username: customer.username,
+                id: user.id,
+                role:user.role,
+                username: user.username,
             });
-            let cid = customer.id;
-            return res.status(200).json({ token, cid });
+            let uid = user.id;
+            return res.status(200).json({ token, uid });
         } catch (error) {
             next(error);
         }
@@ -18,13 +19,13 @@ exports.default = {
     register: async (req, res, next) => {
         try {
             let customerInfo = req.body;
-            let customer = await svc.createCustomer(customerInfo);
+            let user = await svc.createCustomer(customerInfo);
             let token = svc.getLoginToken({
-                id: customer.id,
-                username: customer.username,
+                id: user.id,
+                username: user.username,
             });
-            let cid = customer.id;
-            return res.status(200).json({ token, cid });
+            let uid = user.id;
+            return res.status(200).json({ token, uid });
         } catch (error) {
             next(error);
         }
@@ -55,8 +56,8 @@ exports.default = {
     getProfile: async (req, res, next) => {
         try {
             let id = req.authData.id;
-            let customer = await svc.getProfile(id);
-            return res.status(200).json(customer);
+            let user = await svc.getProfile(id);
+            return res.status(200).json(user);
         } catch (error) {
             next(error);
         }

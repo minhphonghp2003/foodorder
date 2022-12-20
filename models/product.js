@@ -12,8 +12,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       this.belongsTo(models.category)
       this.belongsToMany(models.image, { through: models.product_image })
-      this.belongsToMany(models.customer, { through: models.cart })
-      this.belongsToMany(models.customer, { through: models.order })
+      this.belongsToMany(models.user, { through: models.cart })
+      this.belongsToMany(models.user, { through: models.order })
     }
   }
   product.init({

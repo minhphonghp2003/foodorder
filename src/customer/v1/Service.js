@@ -1,5 +1,5 @@
 const {
-    customer,
+     user,
     pass_reset_email,
     customer_address,
     address,
@@ -17,7 +17,7 @@ exports.default = {
 
     changePasswordBy: async (field, newPass) => {
         const hash = await bcrypt.hash(newPass, saltRounds);
-        await customer.update(
+        await user.update(
             { password: hash },
             {
                 where: field,
@@ -33,7 +33,7 @@ exports.default = {
 
     getValidCustomer: async (credential) => {
         let { username, password } = credential;
-        let cus = await customer.findOne({
+        let cus = await user.findOne({
             where: { username },
         });
 
@@ -45,23 +45,24 @@ exports.default = {
         return cus;
     },
 
-    createCustomer: async (customerInfo) => {
+    createCustomer: async (userInfo) => {
         try {
-            let { password } = customerInfo;
+            let { password } = userInfo;
 
             const hash = await bcrypt.hash(password, saltRounds);
-            customerInfo.password = hash;
-            let cus = await customer.create(customerInfo);
+            userInfo.password = hash;
+            userInfo.role = "customer" 
+            let usr = await user.create(userInfo);
 
-            cus.password = undefined;
-            return cus;
+            usr.password = undefined;
+            return usr;
         } catch (error) {
             throw new Error("Cannot create account");
         }
     },
 
     getProfile: async (id) => {
-        let profile = await customer.findOne({
+        let profile = await user.findOne({
             where: { id },
         });
         profile.password = undefined;
@@ -69,41 +70,41 @@ exports.default = {
     },
 
     changeProfile: async (field, id) => {
-        await customer.update(field, { where: { id } });
+        await user.update(field, { where: { id } });
         return;
     },
 
-    getCustomerAddress: async (customerId) => {
+    getCustomerAddress: async (userId) => {
         let addr = await customer_address.findAll({
-            where: { customerId },
+            where: { userId },
             include: "address",
         });
         return addr;
     },
 
-    createCustomerAddress: async (customerId, addressDetail) => {
+    createCustomerAddress: async (userId, addressDetail) => {
         await customer_address.update(
             { default: 0 },
-            { where: { default: 1, customerId } }
+            { where: { default: 1,  userId } }
         );
         let addr = await address.create(addressDetail);
         let addressId = addr.id;
         let cus_addr = await customer_address.create({
             addressId,
-            customerId,
+            userId,
             addressDetail,
         });
         return cus_addr;
     },
 
-    changeDefaultAddress: async (customerId, addressId) => {
+    changeDefaultAddress: async (userId, addressId) => {
         await customer_address.update(
             { default: 0 },
-            { where: { default: 1, customerId } }
+            { where: { default: 1, userId } }
         );
         await customer_address.update(
             { default: 1 },
-            { where: { customerId, addressId } }
+            { where: { userId, addressId } }
         );
         return;
     },
