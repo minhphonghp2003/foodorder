@@ -5,6 +5,7 @@ const app = express();
 const helmet = require("helmet");
 const cors = require("cors");
 const customer = require("./src/customer/v1/Api");
+const product = require("./src/product/v1/Api");
 
 // app.use(morgan("combined"));
 app.use(express.urlencoded({ extended: true }));
@@ -17,7 +18,12 @@ app.use(
 );
 app.options("*", cors());
 
+
+
 app.use("/v1/customer/", customer);
+app.use("/v1/product/", product);
+
+
 
 app.use((err, req, res, next) => {
     res.status(400).json(err.stack);
