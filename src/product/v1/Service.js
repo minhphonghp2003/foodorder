@@ -23,6 +23,7 @@ module.exports = {
                 await product_image.create({ productId, imageId });
             })
         );
+
         return productId;
     },
 };
