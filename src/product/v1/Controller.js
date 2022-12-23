@@ -14,4 +14,14 @@ exports.default = {
             next(error);
         }
     },
+
+    getAllProduct : async(req,res,next) =>{
+        try {
+           let {page, size} = req.query 
+           let products = await svc.getAllProduct(page,size)
+           return res.status(200).json(products)
+        } catch (error) {
+           next(error) 
+        }
+    }
 };

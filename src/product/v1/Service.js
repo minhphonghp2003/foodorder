@@ -26,4 +26,11 @@ module.exports = {
 
         return productId;
     },
+
+    getAllProduct: async (page, size) => {
+        const limit = size ? size : 9;
+        const offset = page ? (page-1) * limit : 0;
+        let paginatedProd = await product.findAll({ limit,offset });
+        return paginatedProd;
+    },
 };

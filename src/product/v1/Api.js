@@ -6,5 +6,6 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 router.post("/",checkAuth, upload.array("images"), ctrler.createProduct);
+router.get("/all", ctrler.getAllProduct);
 
 module.exports = router;
