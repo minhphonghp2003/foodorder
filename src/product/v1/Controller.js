@@ -17,10 +17,11 @@ exports.default = {
 
     getAllProduct : async(req,res,next) =>{
         try {
-           let {page, size} = req.query 
-           let products = await svc.getAllProduct(page,size)
+           let {page, size,sorting,cate} = req.query 
+           let products = await svc.getAllProduct(page,size,sorting,cate)
            return res.status(200).json(products)
         } catch (error) {
+           console.log(error);
            next(error) 
         }
     }

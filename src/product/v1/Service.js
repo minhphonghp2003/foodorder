@@ -1,10 +1,12 @@
-const { product, product_image, image } = require("../../../models");
+const { product, product_image, image, category, product_review } = require("../../../models");
+const { Op } = require("sequelize");
 const { app } = require("../../../config/firebase");
 const { getStorage, ref, uploadBytes } = require("firebase/storage");
 const storage = getStorage(app);
 
 module.exports = {
     createProduct: async (images, productDetail) => {
+        // add 0 star review
         let productId = (await product.create(productDetail)).id;
 
         await Promise.all(
@@ -27,10 +29,28 @@ module.exports = {
         return productId;
     },
 
-    getAllProduct: async (page, size) => {
+    getAllProduct: async (page, size, sort, cate) => {
         const limit = size ? size : 9;
-        const offset = page ? (page-1) * limit : 0;
-        let paginatedProd = await product.findAll({ limit,offset });
+        const offset = page ? (page - 1) * limit : 0;
+        let paginatedProd = await product.findAll({
+            limit,
+            offset,
+            // order:[
+            //      [sort, 'DESC'],
+            // ],
+            where: {
+                // categoryId: {
+                //     [Op.or]: {
+                //         [Op.eq]: cate,
+                //         [Op.not]:0
+                //       }
+                //   }
+            },
+            include: {
+                model: product_review,
+                attributes: [ "rating"],
+            },
+        });
         return paginatedProd;
     },
 };
