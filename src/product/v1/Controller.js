@@ -17,8 +17,9 @@ exports.default = {
 
     getAllProduct : async(req,res,next) =>{
         try {
-           let {page, size,sorting,cate} = req.query 
-           let products = await svc.getAllProduct(page,size,sorting,cate)
+           let {page, size,cate} = req.query 
+           let sort = req.query.sort? req.query.sort: "price"
+           let products = await svc.getAllProduct(page,size,sort,cate)
            return res.status(200).json(products)
         } catch (error) {
            console.log(error);

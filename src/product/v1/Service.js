@@ -1,4 +1,10 @@
-const { product, product_image, image, category, product_review } = require("../../../models");
+const {
+    product,
+    product_image,
+    image,
+    category,
+    product_review,
+} = require("../../../models");
 const { Op } = require("sequelize");
 const { app } = require("../../../config/firebase");
 const { getStorage, ref, uploadBytes } = require("firebase/storage");
@@ -6,7 +12,7 @@ const storage = getStorage(app);
 
 module.exports = {
     createProduct: async (images, productDetail) => {
-        // add 0 star review
+        // TODO: add 0 star review
         let productId = (await product.create(productDetail)).id;
 
         await Promise.all(
@@ -30,27 +36,33 @@ module.exports = {
     },
 
     getAllProduct: async (page, size, sort, cate) => {
+
         const limit = size ? size : 9;
         const offset = page ? (page - 1) * limit : 0;
         let paginatedProd = await product.findAll({
             limit,
             offset,
-            // order:[
-            //      [sort, 'DESC'],
-            // ],
-            where: {
-                // categoryId: {
-                //     [Op.or]: {
-                //         [Op.eq]: cate,
-                //         [Op.not]:0
-                //       }
-                //   }
-            },
-            include: {
-                model: product_review,
-                attributes: [ "rating"],
-            },
+            include: [
+                {
+                    model: product_review,
+                    attributes: ["rating"],
+                },
+                {
+                    model: image,
+                    attributes: ["link"],
+                },
+            ],
+            attributes: ["id", "name", "price"],
         });
+        for (let product of paginatedProd) {
+            product.dataValues.rating =
+                product.dataValues.product_reviews.reduce(
+                    (p, c) => p + c.rating,
+                    0
+                ) / product.dataValues.product_reviews.length;
+            
+        }
+        // TODO: sort, cate
         return paginatedProd;
     },
 };
