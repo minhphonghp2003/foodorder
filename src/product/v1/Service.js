@@ -131,6 +131,7 @@ module.exports = {
         for (let i of detail.dataValues.images) {
             i.link = await getImageFromFirebase(i.link);
         }
+        // TODO:show related(by cate)
         return detail;
     },
 };
