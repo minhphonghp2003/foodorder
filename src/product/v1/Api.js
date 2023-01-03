@@ -6,6 +6,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 router.post("/",checkAuth, upload.array("images"), ctrler.createProduct);
+router.post("/category",checkAuth,  ctrler.createCategory);
 router.get("/", ctrler.getAllProduct);
+router.get("/detail/:id", ctrler.getProduct);
+router.get("/category", ctrler.getCategoryDetail);
+router.put("/",checkAuth,  ctrler.updateProduct);
+router.delete("/",checkAuth,  ctrler.deleteProduct);
 
 module.exports = router;

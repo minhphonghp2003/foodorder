@@ -1,13 +1,14 @@
 const { initializeApp } = require("firebase/app") 
 const { getStorage } = require("firebase/storage") 
+require('dotenv').config()
 
 const firebaseConfig = {
-    apiKey: "AIzaSyC4DPL618IrHN-qIoLYHT683ZefKvRsMjU",
-    authDomain: "staticfile-9a793.firebaseapp.com",
+    apiKey: process.env.FBASE_API_KEY,
+    authDomain: process.env.FBASE_DOMAIN,
     projectId: "staticfile-9a793",
-    storageBucket: "staticfile-9a793.appspot.com",
+    storageBucket: process.env.FBASE_BUCKET,
     messagingSenderId: "810775382890",
-    appId: "1:810775382890:web:83607a1de87040449a3313",
+    appId: process.env.FBASE_APP_ID,
     measurementId: "G-GSPX8CDSBD"
 };
 

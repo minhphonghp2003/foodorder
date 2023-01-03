@@ -1,5 +1,6 @@
+require('dotenv').config()
 
-{
+module.exports ={
   "development": {
     "username": "postgres",
     "password": "postgres",
@@ -15,10 +16,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "bbgoeoxh",
-    "password": "ZKrgm-B4VSBt92fpVrBrZ0UtJok8wbQx",
-    "database": "bbgoeoxh",
-    "host": "tiny.db.elephantsql.com",
+    "username": process.env.SQL_NAME,
+    "password": process.env.SQL_PASSWORD,
+    "database": process.env.SQL_NAME,
+    "host": process.env.SQL_HOST,
     "dialect": "postgres"
   }
 }
