@@ -59,7 +59,7 @@ module.exports = {
             attributes: ["id", "name", "price", "createdAt"],
         });
         for (let product of paginatedProd) {
-            await productImageAndRateExtrc(product);
+            await ExtractProdImgAndRate(product);
         }
         let productCount = await product.count();
         return { paginatedProd, productCount };
@@ -83,13 +83,17 @@ module.exports = {
         return (await category.create({ name })).id;
     },
 
-    getCategoryDetail: async (id) => {
+    getProductByCategory: async (id, page, size) => {
+        const limit = size ? size : 4;
+        const offset = page ? (page - 1) * limit : 0;
         let detail = await category.findOne({
             where: {
                 id,
             },
             include: {
                 model: product,
+                limit,
+                offset,
                 attributes: ["id", "name", "price"],
                 order: [["createdAt", "DESC"]],
                 include: [
@@ -105,7 +109,7 @@ module.exports = {
             },
         });
         for (let product of detail.dataValues.products) {
-            await productImageAndRateExtrc(product);
+            await ExtractProdImgAndRate(product);
         }
         return detail;
     },
@@ -114,9 +118,11 @@ module.exports = {
             where: {
                 id,
             },
+            attributes: { exclude: ["categoryId"] },
             include: [
                 {
                     model: category,
+                    attributes: ["name", "id"],
                 },
                 {
                     model: image,
@@ -131,14 +137,23 @@ module.exports = {
         for (let i of detail.dataValues.images) {
             i.link = await getImageFromFirebase(i.link);
         }
-        // TODO:show related(by cate)
-        return detail;
+        return { detail };
+    },
+
+    createReview: async (productId,rating, name, email, content) => {
+        let newReviewer  = await reviewer.create({ name,email })
+        let reviewerId = newReviewer.dataValues.id
+        let body = await product_review.create({
+            rating, content,reviewerId,productId
+
+        })
+        return body;
     },
 };
 
 // -------------------------------------------------------------------------------
 
-let productImageAndRateExtrc = async (product) => {
+let ExtractProdImgAndRate = async (product) => {
     product.dataValues.rating = avgCalc(
         product.dataValues.product_reviews,
         "rating"

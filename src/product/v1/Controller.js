@@ -84,10 +84,10 @@ exports.default = {
         }
     },
 
-    getCategoryDetail: async (req, res, next) => {
+    getProductByCategory: async (req, res, next) => {
         try {
-            let id = req.query.id;
-            let categoryAndProduct = await svc.getCategoryDetail(id);
+            let {id,page,size} = req.query;
+            let categoryAndProduct = await svc.getProductByCategory(id,page,size);
             return res.status(200).json(categoryAndProduct);
         } catch (error) {
             next(error);
@@ -104,4 +104,15 @@ exports.default = {
             next(error);
         }
     },
+
+    createReview: async(req,res,next) =>{
+        try {
+           let {productId,email,name,rating, content} = req.body 
+           let  review= await svc.createReview(productId,rating,name,email,content)
+           return res.status(200).json(review)
+        } catch (error) {
+            console.log(error);
+           next(error) 
+        }
+    }
 };

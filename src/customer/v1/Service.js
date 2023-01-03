@@ -1,18 +1,23 @@
 const {
-     user,
+    user,
     pass_reset_email,
     customer_address,
     address,
 } = require("../../../models");
 const bcrypt = require("bcrypt");
 const { signToken } = require("../../../library/jwt");
-const { where } = require("sequelize");
 const saltRounds = 10;
 
 exports.default = {
     createEmailForPasswordChange: async (email) => {
         let entry = await pass_reset_email.create(email);
         return entry;
+    },
+    getEmail: async (id) => {
+        return await pass_reset_email.findOne({
+            where: { id },
+            attributes: ["email"],
+        });
     },
 
     changePasswordBy: async (field, newPass) => {
@@ -51,7 +56,7 @@ exports.default = {
 
             const hash = await bcrypt.hash(password, saltRounds);
             userInfo.password = hash;
-            userInfo.role = "customer" 
+            userInfo.role = "customer";
             let usr = await user.create(userInfo);
 
             usr.password = undefined;
@@ -85,7 +90,7 @@ exports.default = {
     createCustomerAddress: async (userId, addressDetail) => {
         await customer_address.update(
             { default: 0 },
-            { where: { default: 1,  userId } }
+            { where: { default: 1, userId } }
         );
         let addr = await address.create(addressDetail);
         let addressId = addr.id;
@@ -111,6 +116,6 @@ exports.default = {
 
     changeAddressDetail: async (id, addressDetail) => {
         await address.update(addressDetail, { where: { id } });
-        return 
+        return;
     },
 };

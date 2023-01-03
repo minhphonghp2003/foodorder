@@ -39,6 +39,13 @@ exports.default = {
             next(error);
         }
     },
+    getEmail:async(req,res,next) =>{
+        try {
+           return res.status(200).json(await svc.getEmail(req.query.id) ) 
+        } catch (error) {
+           next(error) 
+        }
+    },
 
     changePassword: async (req, res, next) => {
         try {

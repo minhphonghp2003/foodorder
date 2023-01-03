@@ -5,6 +5,7 @@ const { checkAuth } = require("../../../middleware/checkAuth");
 const router = express.Router();
 router.get("/profile", checkAuth, ctrler.getProfile);
 router.get("/address", checkAuth, ctrler.getCustomerAddress);
+router.get("/email", ctrler.getEmail);
 router.post("/login", ctrler.login);
 router.post("/register", ctrler.register);
 router.post("/address",checkAuth, ctrler.createCustomerAddress);
