@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const cors = require("cors");
 const customer = require("./src/customer/v1/Api");
 const product = require("./src/product/v1/Api");
+const cart = require("./src/cart/v1/Api");
 
 // app.use(morgan("combined"));
 app.use(express.urlencoded({ extended: true }));
@@ -22,6 +23,7 @@ app.options("*", cors());
 
 app.use("/v1/customer/", customer);
 app.use("/v1/product/", product);
+app.use("/v1/cart/", cart);
 
 
 

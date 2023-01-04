@@ -12,7 +12,11 @@ module.exports = (sequelize, DataTypes) => {
             this.belongsToMany(models.address, {
                 through: models.customer_address,
             });
+            this.belongsToMany(models.product, {
+                through: models.cart,
+            });
             this.hasMany(models.customer_address);
+            this.hasMany(models.cart);
         }
     }
     user.init(
