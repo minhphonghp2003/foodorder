@@ -64,7 +64,7 @@ exports.default = {
             }
             let id = req.body.id;
             await svc.deleteProduct(id);
-            return res.status(200).json("done");
+            return res.status(200).json({isDone:true});
         } catch (error) {
             next(error);
         }

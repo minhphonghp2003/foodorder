@@ -9,8 +9,8 @@ exports.default = {
                 role:user.role,
                 username: user.username,
             });
-            let uid = user.id;
-            return res.status(200).json({ token, uid });
+            let id = user.id;
+            return res.status(200).json({ token, id });
         } catch (error) {
             next(error);
         }
@@ -24,8 +24,8 @@ exports.default = {
                 id: user.id,
                 username: user.username,
             });
-            let uid = user.id;
-            return res.status(200).json({ token, uid });
+            let id = user.id;
+            return res.status(200).json({ token, id });
         } catch (error) {
             next(error);
         }
@@ -75,7 +75,7 @@ exports.default = {
             let id = req.authData.id;
             let field = req.body;
             await svc.changeProfile(field, id);
-            return res.status(200).json("done");
+            return res.status(200).json({isDone:true});
         } catch (error) {
             next(error);
         }

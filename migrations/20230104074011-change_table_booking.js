@@ -9,19 +9,19 @@ module.exports = {
          * Example:
          * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
          */
-        await queryInterface.addColumn("table_bookings", "name", {
-            type: Sequelize.STRING,
-        });
-        await queryInterface.addColumn("table_bookings", "phone", {
-            type: Sequelize.STRING,
-        });
-        await queryInterface.addColumn("table_bookings", "adult", {
-            type: Sequelize.INTEGER,
-        });
-        await queryInterface.addColumn("table_bookings", "kid", {
-            type: Sequelize.INTEGER,
-        });
-        await queryInterface.removeColumn("table_bookings", "userId", {});
+        // await queryInterface.addColumn("table_bookings", "name", {
+        //     type: Sequelize.STRING,
+        // });
+        // await queryInterface.addColumn("table_bookings", "phone", {
+        //     type: Sequelize.STRING,
+        // });
+        // await queryInterface.addColumn("table_bookings", "adult", {
+        //     type: Sequelize.INTEGER,
+        // });
+        // await queryInterface.addColumn("table_bookings", "kid", {
+        //     type: Sequelize.INTEGER,
+        // });
+        // await queryInterface.removeColumn("table_bookings", "userId", {});
     },
 
     async down(queryInterface, Sequelize) {
