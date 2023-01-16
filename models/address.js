@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     street: DataTypes.STRING,
     commune_ward: DataTypes.STRING,
-    city: DataTypes.STRING
+    city: DataTypes.STRING,
+    district: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'address',
