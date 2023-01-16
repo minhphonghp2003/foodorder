@@ -118,4 +118,19 @@ exports.default = {
         await address.update(addressDetail, { where: { id } });
         return;
     },
+
+    deleteAdderss: async (userId, addressId) => {
+        await customer_address.destroy({
+            where: {
+                userId,
+                addressId,
+            },
+        });
+        await address.destroy({
+            where:{
+                id:addressId
+            }
+        })
+        return
+    },
 };

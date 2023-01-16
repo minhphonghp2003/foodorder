@@ -9,6 +9,7 @@ router.get("/email", ctrler.getEmail);
 router.post("/login", ctrler.login);
 router.post("/register", ctrler.register);
 router.post("/address",checkAuth, ctrler.createCustomerAddress);
+router.delete("/address",checkAuth, ctrler.deletaAddress);
 router.post("/emailentry", ctrler.createEmailForChange);
 router.put("/password", ctrler.changePassword);
 router.put("/profile", checkAuth, ctrler.changeProfile);

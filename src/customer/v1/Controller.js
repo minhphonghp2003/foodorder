@@ -124,5 +124,16 @@ exports.default = {
             console.log(error);
            next(error) 
         }
+    },
+
+    deletaAddress:async(req,res,next)=>{
+        try {
+           let {id} = req.body
+           let userId = req.authData.id 
+           await svc.deleteAdderss(userId,id)
+           return res.status(200).json("done")
+        } catch (error) {
+           next(error) 
+        }
     }
 };
