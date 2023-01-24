@@ -69,6 +69,14 @@ exports.default = {
             next(error);
         }
     },
+    getAllCategory: async(req,res,next) =>{
+        try {
+           let categories =  await svc.getAllCategory() 
+           return res.status(200).json(categories)
+        } catch (error) {
+           next(error); 
+        }
+    },
 
     createCategory: async (req, res, next) => {
         try {

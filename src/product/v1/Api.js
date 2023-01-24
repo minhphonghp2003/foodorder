@@ -11,6 +11,7 @@ router.post("/review",  ctrler.createReview);
 router.get("/", ctrler.getAllProduct);
 router.get("/detail/:id", ctrler.getProduct);
 router.get("/category", ctrler.getProductByCategory);
+router.get("/category/all", ctrler.getAllCategory);
 router.put("/",checkAuth,  ctrler.updateProduct);
 router.delete("/",checkAuth,  ctrler.deleteProduct);
 

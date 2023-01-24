@@ -113,6 +113,10 @@ module.exports = {
         }
         return detail;
     },
+    getAllCategory:async() =>{
+        return await category.findAll();
+    },
+
     getProductDetail: async (id) => {
         let detail = await product.findOne({
             where: {
