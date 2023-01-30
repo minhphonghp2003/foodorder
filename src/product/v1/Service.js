@@ -36,6 +36,7 @@ module.exports = {
             limit,
             offset,
             order: [[sort, "DESC"]],
+
             include: [
                 {
                     model: product_review,
@@ -105,7 +106,16 @@ module.exports = {
         return detail;
     },
     getAllCategory: async () => {
-        return await category.findAll();
+        let cates = await category.findAll({
+            include: ["image"],
+            raw: true,
+            nest: true,
+        });
+        for (c of cates) {
+            c.image = await getImageFromFirebase(c.image.link);
+        }
+
+        return cates;
     },
 
     getProductDetail: async (id) => {
@@ -164,7 +174,9 @@ let ExtractProdImgAndRate = async (product) => {
 };
 
 let avgCalc = (array, property) => {
-    return array.reduce((p, c) => p + c[property], 0) / array.length;
+    if (array != null) {
+        return array.reduce((p, c) => p + c[property], 0) / array.length;
+    }
 };
 
 let getImageFromFirebase = async (path) => {
