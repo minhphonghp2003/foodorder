@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/minhphonghp2003/restaurant#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^8.6.0",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",

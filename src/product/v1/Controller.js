@@ -123,5 +123,15 @@ exports.default = {
             console.log(error);
            next(error) 
         }
+    },
+
+    search: async(req,res,next)=>{
+        try {
+           let {query} = req.query 
+           let result = await svc.search(query)
+           return res.status(200).json(result)
+        } catch (error) {
+           next(error) 
+        }
     }
 };

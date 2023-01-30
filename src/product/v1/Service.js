@@ -6,6 +6,7 @@ const {
     product_review,
     reviewer,
 } = require("../../../models");
+const elastic_client = require("../../../library/elastic_client");
 const { app } = require("../../../config/firebase");
 const {
     getStorage,
@@ -13,6 +14,7 @@ const {
     uploadBytes,
     getDownloadURL,
 } = require("firebase/storage");
+const { async } = require("@firebase/util");
 const storage = getStorage(app);
 
 module.exports = {
@@ -72,7 +74,17 @@ module.exports = {
     },
     createCategory: async (name, image) => {
         let imageId = await createImage(image);
-        return (await category.create({ name, imageId })).id;
+        let categoryId = (await category.create({ name, imageId })).id;
+        let elasticResult = await elastic_client.index({
+            index: "food",
+            id: "cate" + categoryId,
+            body: {
+                type:"category",
+                id:categoryId,
+                name: name,
+            },
+        });
+        return categoryId;
     },
 
     getProductByCategory: async (id, page, size) => {
@@ -155,6 +167,18 @@ module.exports = {
             productId,
         });
         return body;
+    },
+
+    search: async (query) => {
+        let result = await elastic_client.search({
+            index: "food",
+            // query: {
+            //     match: {
+            //         name: query,
+            //     },
+            // },
+        });
+        return result.hits.hits
     },
 };
 
