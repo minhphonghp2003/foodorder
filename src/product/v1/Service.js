@@ -21,17 +21,7 @@ module.exports = {
 
         await Promise.all(
             images.map(async (i) => {
-                let file_name =
-                    (Date.now() % 1000000000) -
-                    Math.round(Math.random() * 100000000) +
-                    "-" +
-                    i.originalname;
-                let dest_storage = "foodorder/product/" + file_name;
-                let storageRef = ref(storage, dest_storage);
-                let bytes = i.buffer;
-
-                await uploadBytes(storageRef, bytes);
-                let imageId = (await image.create({ link: dest_storage })).id;
+                let imageId = await createImage(i);
                 await product_image.create({ productId, imageId });
             })
         );
@@ -79,8 +69,9 @@ module.exports = {
             },
         });
     },
-    createCategory: async (name) => {
-        return (await category.create({ name })).id;
+    createCategory: async (name, image) => {
+        let imageId = await createImage(image);
+        return (await category.create({ name, imageId })).id;
     },
 
     getProductByCategory: async (id, page, size) => {
@@ -113,7 +104,7 @@ module.exports = {
         }
         return detail;
     },
-    getAllCategory:async() =>{
+    getAllCategory: async () => {
         return await category.findAll();
     },
 
@@ -144,13 +135,15 @@ module.exports = {
         return { detail };
     },
 
-    createReview: async (productId,rating, name, email, content) => {
-        let newReviewer  = await reviewer.create({ name,email })
-        let reviewerId = newReviewer.dataValues.id
+    createReview: async (productId, rating, name, email, content) => {
+        let newReviewer = await reviewer.create({ name, email });
+        let reviewerId = newReviewer.dataValues.id;
         let body = await product_review.create({
-            rating, content,reviewerId,productId
-
-        })
+            rating,
+            content,
+            reviewerId,
+            productId,
+        });
         return body;
     },
 };
@@ -181,4 +174,18 @@ let getImageFromFirebase = async (path) => {
         return downloadUrl;
     }
     return null;
+};
+
+let createImage = async (file) => {
+    let file_name =
+        (Date.now() % 1000000000) -
+        Math.round(Math.random() * 100000000) +
+        "-" +
+        file.originalname;
+    let dest_storage = "foodorder/product/" + file_name;
+    let storageRef = ref(storage, dest_storage);
+    let bytes = file.buffer;
+
+    await uploadBytes(storageRef, bytes);
+    return (await image.create({ link: dest_storage })).id;
 };

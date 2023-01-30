@@ -85,7 +85,8 @@ exports.default = {
                 throw new Error("Not allowed");
             }
             let name = req.body.name;
-            let id = await svc.createCategory(name);
+            let image = req.file
+            let id = await svc.createCategory(name,image);
             return res.status(200).json(id);
         } catch (error) {
             next(error);

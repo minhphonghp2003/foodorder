@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasMany(models.product)
+      this.belongsTo(models.image)
     }
   }
   category.init({
