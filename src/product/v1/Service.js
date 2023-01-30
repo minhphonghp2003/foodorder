@@ -75,15 +75,7 @@ module.exports = {
     createCategory: async (name, image) => {
         let imageId = await createImage(image);
         let categoryId = (await category.create({ name, imageId })).id;
-        let elasticResult = await elastic_client.index({
-            index: "food",
-            id: "cate" + categoryId,
-            body: {
-                type:"category",
-                id:categoryId,
-                name: name,
-            },
-        });
+        await createElasticDocument("category", categoryId, name);
         return categoryId;
     },
 
@@ -178,7 +170,7 @@ module.exports = {
                 },
             },
         });
-        return result.hits.hits
+        return result.hits.hits;
     },
 };
 
@@ -224,4 +216,16 @@ let createImage = async (file) => {
 
     await uploadBytes(storageRef, bytes);
     return (await image.create({ link: dest_storage })).id;
+};
+
+let createElasticDocument = async (type, id,name) => {
+    elastic_client.index({
+        index: "food",
+        id: type + id,
+        body: {
+            type: type,
+            id: id,
+            name: name,
+        },
+    });
 };
