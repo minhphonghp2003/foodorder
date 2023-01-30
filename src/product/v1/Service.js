@@ -172,11 +172,11 @@ module.exports = {
     search: async (query) => {
         let result = await elastic_client.search({
             index: "food",
-            // query: {
-            //     match: {
-            //         name: query,
-            //     },
-            // },
+            query: {
+                match: {
+                    name: query,
+                },
+            },
         });
         return result.hits.hits
     },
