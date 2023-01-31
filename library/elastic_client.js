@@ -1,6 +1,6 @@
 const { Client } = require('@elastic/elasticsearch')
 const config = require("../config/elastic")
-const client = new Client({
+const elasticCloudClient = new Client({
   cloud: { id: config.cloudId },
 auth: {
         username: config.username,
@@ -8,4 +8,16 @@ auth: {
     },
 })
 
-module.exports = client
+const elasticNodeClient = new  Client({
+  node: config.node,
+  auth: {
+    username: 'elastic',
+    password: config.nodePassword
+  },
+  tls: {
+    ca: config.nodeCA,
+    rejectUnauthorized: false
+  }
+})
+
+module.exports = { elasticCloudClient,  elasticNodeClient}

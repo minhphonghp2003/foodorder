@@ -6,7 +6,10 @@ const {
     product_review,
     reviewer,
 } = require("../../../models");
-const elastic_client = require("../../../library/elastic_client");
+const {
+    elasticCloudClient,
+    elasticNodeClient,
+} = require("../../../library/elastic_client");
 const { app } = require("../../../config/firebase");
 const {
     getStorage,
@@ -58,6 +61,32 @@ module.exports = {
         return { paginatedProd, productCount };
     },
 
+    getProductDetail: async (id) => {
+        let detail = await product.findOne({
+            where: {
+                id,
+            },
+            attributes: { exclude: ["categoryId"] },
+            include: [
+                {
+                    model: category,
+                    attributes: ["name", "id"],
+                },
+                {
+                    model: image,
+                    attributes: ["link"],
+                },
+                {
+                    model: reviewer,
+                    attributes: ["name"],
+                },
+            ],
+        });
+        for (let i of detail.dataValues.images) {
+            i.link = await getImageFromFirebase(i.link);
+        }
+        return { detail };
+    },
     updateProduct: async (id, field) => {
         await product.update(field, {
             where: { id },
@@ -121,34 +150,7 @@ module.exports = {
 
         return cates;
     },
-
-    getProductDetail: async (id) => {
-        let detail = await product.findOne({
-            where: {
-                id,
-            },
-            attributes: { exclude: ["categoryId"] },
-            include: [
-                {
-                    model: category,
-                    attributes: ["name", "id"],
-                },
-                {
-                    model: image,
-                    attributes: ["link"],
-                },
-                {
-                    model: reviewer,
-                    attributes: ["name"],
-                },
-            ],
-        });
-        for (let i of detail.dataValues.images) {
-            i.link = await getImageFromFirebase(i.link);
-        }
-        return { detail };
-    },
-
+    
     createReview: async (productId, rating, name, email, content) => {
         let newReviewer = await reviewer.create({ name, email });
         let reviewerId = newReviewer.dataValues.id;
@@ -162,11 +164,11 @@ module.exports = {
     },
 
     search: async (query) => {
-        let result = await elastic_client.search({
+        let result = await elasticNodeClient.search({
             index: "food",
             query: {
-                match: {
-                    name: query,
+                query_string: {
+                    query: `*${query}*`,
                 },
             },
         });
@@ -218,8 +220,8 @@ let createImage = async (file) => {
     return (await image.create({ link: dest_storage })).id;
 };
 
-let createElasticDocument = async (type, id,name) => {
-    elastic_client.index({
+let createElasticDocument = async (type, id, name) => {
+    elasticNodeClient.index({
         index: "food",
         id: type + id,
         body: {
