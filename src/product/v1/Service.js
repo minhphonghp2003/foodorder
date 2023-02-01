@@ -48,6 +48,10 @@ module.exports = {
                     attributes: ["rating"],
                 },
                 {
+                    model: category,
+                    attributes: ["id", "name"],
+                },
+                {
                     model: image,
                     attributes: ["link"],
                 },
@@ -114,24 +118,28 @@ module.exports = {
             where: {
                 id,
             },
-            include: {
-                model: product,
-                limit,
-                offset,
-                attributes: ["id", "name", "price"],
-                order: [["createdAt", "DESC"]],
-                include: [
-                    {
-                        model: product_review,
-                        attributes: ["rating"],
-                    },
-                    {
-                        model: image,
-                        attributes: ["link"],
-                    },
-                ],
-            },
+            // limit,
+            // offset,
+            include: [
+                {
+                    model: product,
+
+                    attributes: ["id", "name", "price"],
+                    order: [["createdAt", "DESC"]],
+                    include: [
+                        {
+                            model: product_review,
+                            attributes: ["rating"],
+                        },
+                        {
+                            model: image,
+                            attributes: ["link"],
+                        },
+                    ],
+                },
+            ],
         });
+
         for (let product of detail.dataValues.products) {
             await ExtractProdImgAndRate(product);
         }
