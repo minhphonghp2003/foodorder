@@ -5,6 +5,8 @@ const {
     category,
     product_review,
     reviewer,
+    sequelize,
+    favorite,
 } = require("../../../models");
 const {
     elasticCloudClient,
@@ -34,18 +36,17 @@ module.exports = {
         return productId;
     },
 
-    getAllProduct: async (page, size, sort) => {
+    getAllProduct: async (page, size, sort, userId) => {
         const limit = size ? size : 9;
         const offset = page ? (page - 1) * limit : 0;
         let paginatedProd = await product.findAll({
             limit,
             offset,
-            order: [[sort, "DESC"]],
-
+            order:[[sort,"DESC"]],
             include: [
                 {
                     model: product_review,
-                    attributes: ["rating"],
+                    attributes: ["rating", "id"],
                 },
                 {
                     model: category,
@@ -59,8 +60,19 @@ module.exports = {
             attributes: ["id", "name", "price", "createdAt"],
         });
         for (let product of paginatedProd) {
+            product.dataValues.reviewCount =
+                product.dataValues.product_reviews.length;
             await ExtractProdImgAndRate(product);
+            if (await isFavorite(userId, product.dataValues.id)) {
+                product.dataValues.isFavorite = true;
+            } else {
+                product.dataValues.isFavorite = false;
+            }
         }
+
+        // paginatedProd.sort((a, b) => {
+        //     return b.dataValues[sort] - a.dataValues[sort];
+        // });
         let productCount = await product.count();
         return { paginatedProd, productCount };
     },
@@ -111,15 +123,12 @@ module.exports = {
         return categoryId;
     },
 
-    getProductByCategory: async (id, page, size) => {
-        const limit = size ? size : 4;
-        const offset = page ? (page - 1) * limit : 0;
+    getProductByCategory: async (id) => {
         let detail = await category.findOne({
             where: {
                 id,
             },
-            // limit,
-            // offset,
+
             include: [
                 {
                     model: product,
@@ -236,4 +245,20 @@ let createElasticDocument = async (body) => {
         id: type + id,
         body,
     });
+};
+
+let isFavorite = async (userId, productId) => {
+    if (!userId|| userId=="null") {
+        return false;
+    }
+    let isExist = await favorite.findOne({
+        where: {
+            userId,
+            productId,
+        },
+    });
+    if (!isExist) {
+        return false;
+    }
+    return true;
 };

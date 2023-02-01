@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
                 through: models.customer_address,
             });
             this.belongsToMany(models.product, {
+                through: models.favorite,
+            });
+            this.belongsToMany(models.product, {
                 through: models.cart,
             });
             this.hasMany(models.customer_address);

@@ -1,4 +1,5 @@
 const svc = require("./Service");
+const { v4, parse } = require("uuid");
 exports.default = {
     createProduct: async (req, res, next) => {
         try {
@@ -17,21 +18,12 @@ exports.default = {
 
     getAllProduct: async (req, res, next) => {
         try {
-            let { page, size } = req.query;
+            let { page, size, userId } = req.query;
             let sort = req.query.sort;
-            switch (sort) {
-                case "lastest":
-                    sort = "createdAt";
-                    break;
-                case "price":
-                    sort = "price";
-                    break;
-
-                default:
-                    sort = "createdAt";
-                    break;
+            if (!sort || sort =='null') {
+                sort = "createdAt";
             }
-            let products = await svc.getAllProduct(page, size, sort);
+            let products = await svc.getAllProduct(page, size, sort, userId);
             return res.status(200).json(products);
         } catch (error) {
             console.log(error);
@@ -95,12 +87,8 @@ exports.default = {
 
     getProductByCategory: async (req, res, next) => {
         try {
-            let { id, page, size } = req.query;
-            let categoryAndProduct = await svc.getProductByCategory(
-                id,
-                page,
-                size
-            );
+            let { id } = req.query;
+            let categoryAndProduct = await svc.getProductByCategory(id);
             return res.status(200).json(categoryAndProduct);
         } catch (error) {
             next(error);
@@ -109,8 +97,8 @@ exports.default = {
 
     deleteCategory: async (req, res, next) => {
         try {
-            if(req.authData.role != "admin"){
-                throw new Error("You are now allowed")
+            if (req.authData.role != "admin") {
+                throw new Error("You are now allowed");
             }
             let { id } = req.body;
             await svc.deleteCategory(id);

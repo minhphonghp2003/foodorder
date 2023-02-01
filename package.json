@@ -6,6 +6,9 @@
   "scripts": {
     "start": "nodemon --inspect ./index.js",
     "migrate": "npx sequelize-cli db:migrate",
+    "migrateproduction": "npx sequelize-cli db:migrate --env production",
+    "undomigrate": "npx sequelize-cli db:migrate:undo",
+    "undomigrateproduction": "npx sequelize-cli db:migrate:undo --env production",
     "test": "node test.js"
   },
   "repository": {
