@@ -64,17 +64,17 @@ exports.default = {
             }
             let id = req.body.id;
             await svc.deleteProduct(id);
-            return res.status(200).json({isDone:true});
+            return res.status(200).json({ isDone: true });
         } catch (error) {
             next(error);
         }
     },
-    getAllCategory: async(req,res,next) =>{
+    getAllCategory: async (req, res, next) => {
         try {
-           let categories =  await svc.getAllCategory() 
-           return res.status(200).json(categories)
+            let categories = await svc.getAllCategory();
+            return res.status(200).json(categories);
         } catch (error) {
-           next(error); 
+            next(error);
         }
     },
 
@@ -85,8 +85,8 @@ exports.default = {
                 throw new Error("Not allowed");
             }
             let name = req.body.name;
-            let image = req.file
-            let id = await svc.createCategory(name,image);
+            let image = req.file;
+            let id = await svc.createCategory(name, image);
             return res.status(200).json(id);
         } catch (error) {
             next(error);
@@ -95,9 +95,26 @@ exports.default = {
 
     getProductByCategory: async (req, res, next) => {
         try {
-            let {id,page,size} = req.query;
-            let categoryAndProduct = await svc.getProductByCategory(id,page,size);
+            let { id, page, size } = req.query;
+            let categoryAndProduct = await svc.getProductByCategory(
+                id,
+                page,
+                size
+            );
             return res.status(200).json(categoryAndProduct);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    deleteCategory: async (req, res, next) => {
+        try {
+            if(req.authData.role != "admin"){
+                throw new Error("You are now allowed")
+            }
+            let { id } = req.body;
+            await svc.deleteCategory(id);
+            return res.status(200).json("done");
         } catch (error) {
             next(error);
         }
@@ -114,24 +131,30 @@ exports.default = {
         }
     },
 
-    createReview: async(req,res,next) =>{
+    createReview: async (req, res, next) => {
         try {
-           let {productId,email,name,rating, content} = req.body 
-           let  review= await svc.createReview(productId,rating,name,email,content)
-           return res.status(200).json(review)
+            let { productId, email, name, rating, content } = req.body;
+            let review = await svc.createReview(
+                productId,
+                rating,
+                name,
+                email,
+                content
+            );
+            return res.status(200).json(review);
         } catch (error) {
             console.log(error);
-           next(error) 
+            next(error);
         }
     },
 
-    search: async(req,res,next)=>{
+    search: async (req, res, next) => {
         try {
-           let {query} = req.query 
-           let result = await svc.search(query)
-           return res.status(200).json(result)
+            let { query } = req.query;
+            let result = await svc.search(query);
+            return res.status(200).json(result);
         } catch (error) {
-           next(error) 
+            next(error);
         }
-    }
+    },
 };

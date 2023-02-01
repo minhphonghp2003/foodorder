@@ -15,5 +15,6 @@ router.get("/category/all", ctrler.getAllCategory);
 router.get("/search", ctrler.search);
 router.put("/",checkAuth,  ctrler.updateProduct);
 router.delete("/",checkAuth,  ctrler.deleteProduct);
+router.delete("/category",checkAuth,  ctrler.deleteCategory);
 
 module.exports = router;

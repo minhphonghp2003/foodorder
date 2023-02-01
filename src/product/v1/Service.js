@@ -104,7 +104,6 @@ module.exports = {
     createCategory: async (name, image) => {
         let imageId = await createImage(image);
         let categoryId = (await category.create({ name, imageId })).id;
-        await createElasticDocument("category", categoryId, name);
         return categoryId;
     },
 
@@ -150,7 +149,10 @@ module.exports = {
 
         return cates;
     },
-    
+    deleteCategory: async (id) => {
+        return await category.destroy({ where: { id } });
+    },
+
     createReview: async (productId, rating, name, email, content) => {
         let newReviewer = await reviewer.create({ name, email });
         let reviewerId = newReviewer.dataValues.id;
@@ -220,14 +222,10 @@ let createImage = async (file) => {
     return (await image.create({ link: dest_storage })).id;
 };
 
-let createElasticDocument = async (type, id, name) => {
+let createElasticDocument = async (body) => {
     elasticNodeClient.index({
         index: "food",
         id: type + id,
-        body: {
-            type: type,
-            id: id,
-            name: name,
-        },
+        body,
     });
 };

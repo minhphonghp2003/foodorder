@@ -6,7 +6,7 @@ exports.default = {
             let user = await svc.getValidCustomer(credential);
             let token = svc.getLoginToken({
                 id: user.id,
-                role:user.role,
+                role: user.role,
                 username: user.username,
             });
             let id = user.id;
@@ -22,6 +22,7 @@ exports.default = {
             let user = await svc.createCustomer(customerInfo);
             let token = svc.getLoginToken({
                 id: user.id,
+                role: "customer",
                 username: user.username,
             });
             let id = user.id;
@@ -39,11 +40,11 @@ exports.default = {
             next(error);
         }
     },
-    getEmail:async(req,res,next) =>{
+    getEmail: async (req, res, next) => {
         try {
-           return res.status(200).json(await svc.getEmail(req.query.id) ) 
+            return res.status(200).json(await svc.getEmail(req.query.id));
         } catch (error) {
-           next(error) 
+            next(error);
         }
     },
 
@@ -75,7 +76,7 @@ exports.default = {
             let id = req.authData.id;
             let field = req.body;
             await svc.changeProfile(field, id);
-            return res.status(200).json({isDone:true});
+            return res.status(200).json({ isDone: true });
         } catch (error) {
             next(error);
         }
@@ -91,49 +92,52 @@ exports.default = {
         }
     },
 
-    createCustomerAddress: async(req,res,next) =>{
+    createCustomerAddress: async (req, res, next) => {
         try {
-           let customerId = req.authData.id 
-           let addressDetail = req.body
-           let cus_addr = await svc.createCustomerAddress(customerId,addressDetail)
-           return res.status(200).json(cus_addr)
+            let customerId = req.authData.id;
+            let addressDetail = req.body;
+            let cus_addr = await svc.createCustomerAddress(
+                customerId,
+                addressDetail
+            );
+            return res.status(200).json(cus_addr);
         } catch (error) {
-           next(error) 
+            next(error);
         }
     },
 
-    changeDefaultAddress: async(req,res,next) =>{
+    changeDefaultAddress: async (req, res, next) => {
         try {
-           let customerId = req.authData.id 
-           let addressId = req.body.address
-           await svc.changeDefaultAddress(customerId,addressId)
-           return res.status(200).json("done")
+            let customerId = req.authData.id;
+            let addressId = req.body.address;
+            await svc.changeDefaultAddress(customerId, addressId);
+            return res.status(200).json("done");
         } catch (error) {
-           next(error) 
+            next(error);
         }
     },
 
-    changeAddressDetail: async(req,res,next) =>{
+    changeAddressDetail: async (req, res, next) => {
         try {
-            let {id} = req.body
-            delete req.body.id 
-            let addressDetail = req.body
-            await svc.changeAddressDetail(id,addressDetail) 
-            return res.status(200).json("DONE")
+            let { id } = req.body;
+            delete req.body.id;
+            let addressDetail = req.body;
+            await svc.changeAddressDetail(id, addressDetail);
+            return res.status(200).json("DONE");
         } catch (error) {
             console.log(error);
-           next(error) 
+            next(error);
         }
     },
 
-    deletaAddress:async(req,res,next)=>{
+    deletaAddress: async (req, res, next) => {
         try {
-           let {id} = req.body
-           let userId = req.authData.id 
-           await svc.deleteAdderss(userId,id)
-           return res.status(200).json("done")
+            let { id } = req.body;
+            let userId = req.authData.id;
+            await svc.deleteAdderss(userId, id);
+            return res.status(200).json("done");
         } catch (error) {
-           next(error) 
+            next(error);
         }
-    }
+    },
 };
