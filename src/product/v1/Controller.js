@@ -22,9 +22,6 @@ exports.default = {
         try {
             let { page, size, userId } = req.query;
             let sort = req.query.sort;
-            if (!sort || sort =='null') {
-                sort = "createdAt";
-            }
             let products = await svc.getAllProduct(page, size, sort, userId);
             return res.status(200).json(products);
         } catch (error) {
@@ -138,13 +135,13 @@ exports.default = {
         }
     },
 
-    search: async (req, res, next) => {
-        try {
-            let { query } = req.query;
-            let result = await svc.search(query);
-            return res.status(200).json(result);
-        } catch (error) {
-            next(error);
-        }
-    },
+    // search: async (req, res, next) => {
+    //     try {
+    //         let {  keyword, size,page,sort } = req.query;
+    //         let result = await svc.search(keyword,size,page,sort);
+    //         return res.status(200).json(result);
+    //     } catch (error) {
+    //         next(error);
+    //     }
+    // },
 };

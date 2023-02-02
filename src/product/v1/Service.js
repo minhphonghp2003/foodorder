@@ -22,9 +22,17 @@ const {
 } = require("firebase/storage");
 const storage = getStorage(app);
 
+// avg = m/(m+1)*preAvg + d/m+1
+
 module.exports = {
     createProduct: async (images, productDetail, categories) => {
         let createdProduct = await product.create(productDetail);
+        createdProduct.dataValues.rating = 0;
+        
+        createdProduct.dataValues.reviewCount = 0;
+        createdProduct.dataValues.price = Number(
+            createdProduct.dataValues.price
+        );
         await createElasticDocument(
             "product",
             createdProduct.id,
@@ -55,41 +63,18 @@ module.exports = {
     },
 
     getAllProduct: async (page, size, sort, userId) => {
-        const limit = size ? size : 9;
-        const offset = page ? (page - 1) * limit : 0;
-        let paginatedProd = await product.findAll({
-            limit,
-            offset,
-            order: [[sort, "DESC"]],
-            include: [
-                {
-                    model: product_review,
-                    attributes: ["rating", "id"],
-                },
-                {
-                    model: category,
-                    attributes: ["id", "name"],
-                },
-                {
-                    model: image,
-                    attributes: ["link"],
-                },
-            ],
-            attributes: ["id", "name", "price", "createdAt"],
-        });
-        for (let product of paginatedProd) {
-            product.dataValues.reviewCount =
-                product.dataValues.product_reviews.length;
-            await ExtractProdImgAndRate(product);
-            if (await isFavorite(userId, product.dataValues.id)) {
-                product.dataValues.isFavorite = true;
+        let products = await search("*", size, page, sort);
+       
+        for (let product of products.hits) {
+            product._source.images = product._source.images?await getImageFromFirebase(product._source.images[0]):await getImageFromFirebase("foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg")
+            if (await isFavorite(userId, product._source.id)) {
+                product._source.isFavorite = true;
             } else {
-                product.dataValues.isFavorite = false;
+                product._source.isFavorite = false;
             }
         }
-
-        let productCount = await product.count();
-        return { paginatedProd, productCount };
+        return products;
+     
     },
 
     getProductDetail: async (id) => {
@@ -165,7 +150,7 @@ module.exports = {
         });
 
         for (let product of detail.dataValues.products) {
-            await ExtractProdImgAndRate(product);
+            await ExtractProdImg(product);
         }
         return detail;
     },
@@ -196,33 +181,26 @@ module.exports = {
         });
         return body;
     },
-
-    search: async (query) => {
-        let result = await elasticNodeClient.search({
-            index: "food",
-            query: {
-                query_string: {
-                    query: `*${query}*`,
-                },
-            },
-        });
-        return result.hits.hits;
-    },
 };
-
 // -------------------------------------------------------------------------------
-
-let ExtractProdImgAndRate = async (product) => {
-    product.dataValues.rating = avgCalc(
-        product.dataValues.product_reviews,
-        "rating"
-    );
-
-    delete product.dataValues.product_reviews;
-    imagePath = product.dataValues.images[0]
-        ? product.dataValues.images[0].link
-        : null;
-    product.dataValues.images = await getImageFromFirebase(imagePath);
+let search = async (query, size, page, sort) => {
+    size = size ? size : 9;
+    let from = page ? (page - 1) * size : 0;
+    let result = await elasticNodeClient.search({
+        index: "product",
+        size,
+        from,
+        q: query,
+    });
+    if (!sort || sort == "null") {
+        sort = "createdAt";
+    }
+    result.body.hits.hits.sort((a, b) => a._source[sort] - b._source[sort]);
+    return result.body.hits;
+};
+let ExtractProdImg = async (images) => {
+    let imagePath = images ? images[0] : null;
+    images = await getImageFromFirebase(imagePath);
 };
 
 let avgCalc = (array, property) => {
@@ -296,8 +274,9 @@ let isFavorite = async (userId, productId) => {
 
 let addProductCategory = async (productId, categories) => {
     for (cate of categories) {
+        cate.id = parseInt(cate.id)
         let source = `if (!ctx._source.containsKey('categories')) {ctx._source.categories = [];} ctx._source.categories.add(params.category)`;
-        let params = {category:cate};
+        let params = { category: cate };
         updateElasticDocument("product", productId, source, params);
         await product_category.create({
             productId,
