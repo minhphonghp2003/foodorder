@@ -4,6 +4,7 @@ const {
     image,
     category,
     product_review,
+    product_category,
     reviewer,
     sequelize,
     favorite,
@@ -19,21 +20,38 @@ const {
     uploadBytes,
     getDownloadURL,
 } = require("firebase/storage");
-const { async } = require("@firebase/util");
 const storage = getStorage(app);
 
 module.exports = {
-    createProduct: async (images, productDetail) => {
-        let productId = (await product.create(productDetail)).id;
+    createProduct: async (images, productDetail, categories) => {
+        let createdProduct = await product.create(productDetail);
+        await createElasticDocument(
+            "product",
+            createdProduct.id,
+            createdProduct
+        );
+
+        await addProductCategory(createdProduct.id, categories);
 
         await Promise.all(
             images.map(async (i) => {
-                let imageId = await createImage(i);
-                await product_image.create({ productId, imageId });
+                let image = await createImage(i);
+                let params = { link: image.link };
+                let source = `if (!ctx._source.containsKey('images')) {ctx._source.images = [];} ctx._source.images.add(params.link)`;
+                updateElasticDocument(
+                    "product",
+                    createdProduct.id,
+                    source,
+                    params
+                );
+                await product_image.create({
+                    productId: createdProduct.id,
+                    imageId: image.id,
+                });
             })
         );
 
-        return productId;
+        return createdProduct.id;
     },
 
     getAllProduct: async (page, size, sort, userId) => {
@@ -42,7 +60,7 @@ module.exports = {
         let paginatedProd = await product.findAll({
             limit,
             offset,
-            order:[[sort,"DESC"]],
+            order: [[sort, "DESC"]],
             include: [
                 {
                     model: product_review,
@@ -70,9 +88,6 @@ module.exports = {
             }
         }
 
-        // paginatedProd.sort((a, b) => {
-        //     return b.dataValues[sort] - a.dataValues[sort];
-        // });
         let productCount = await product.count();
         return { paginatedProd, productCount };
     },
@@ -236,19 +251,35 @@ let createImage = async (file) => {
     let bytes = file.buffer;
 
     await uploadBytes(storageRef, bytes);
-    return (await image.create({ link: dest_storage })).id;
+    return await image.create({ link: dest_storage });
 };
 
-let createElasticDocument = async (body) => {
-    elasticNodeClient.index({
-        index: "food",
-        id: type + id,
+let createElasticDocument = async (index, id, body) => {
+    await elasticNodeClient.index({
+        index,
+        id,
         body,
     });
 };
 
+let updateElasticDocument = async (index, id, source, params) => {
+    await elasticNodeClient.update({
+        index,
+        id,
+        body: {
+            script: {
+                lang: "painless",
+                //   source: 'ctx._source.times++'
+                // you can also use parameters
+                source,
+                params: params,
+            },
+        },
+    });
+};
+
 let isFavorite = async (userId, productId) => {
-    if (!userId|| userId=="null") {
+    if (!userId || userId == "null") {
         return false;
     }
     let isExist = await favorite.findOne({
@@ -261,4 +292,16 @@ let isFavorite = async (userId, productId) => {
         return false;
     }
     return true;
+};
+
+let addProductCategory = async (productId, categories) => {
+    for (cate of categories) {
+        let source = `if (!ctx._source.containsKey('categories')) {ctx._source.categories = [];} ctx._source.categories.add(params.category)`;
+        let params = {category:cate};
+        updateElasticDocument("product", productId, source, params);
+        await product_category.create({
+            productId,
+            categoryId: cate.id,
+        });
+    }
 };

@@ -11,13 +11,13 @@ auth: {
 const elasticNodeClient = new  Client({
   node: config.node,
   auth: {
-    username: 'elastic',
+    username: config.nodeUsername,
     password: config.nodePassword
   },
-  tls: {
-    ca: config.nodeCA,
-    rejectUnauthorized: false
-  }
+  // tls: {
+  //   ca: config.nodeCA,
+  //   rejectUnauthorized: false
+  // }
 })
 
 module.exports = { elasticCloudClient,  elasticNodeClient}

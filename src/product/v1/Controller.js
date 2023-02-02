@@ -8,8 +8,10 @@ exports.default = {
                 throw new Error("Not allowed");
             }
             let images = req.files;
+            let categories = req.body.categories
+            delete req.body.categories
             let productDetail = req.body;
-            let prd = await svc.createProduct(images, productDetail);
+            let prd = await svc.createProduct(images, productDetail, categories);
             return res.status(200).json(prd);
         } catch (error) {
             next(error);
