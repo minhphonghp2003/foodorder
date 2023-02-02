@@ -8,10 +8,14 @@ exports.default = {
                 throw new Error("Not allowed");
             }
             let images = req.files;
-            let categories = req.body.categories
-            delete req.body.categories
+            let categories = req.body.categories;
+            delete req.body.categories;
             let productDetail = req.body;
-            let prd = await svc.createProduct(images, productDetail, categories);
+            let prd = await svc.createProduct(
+                images,
+                productDetail,
+                categories
+            );
             return res.status(200).json(prd);
         } catch (error) {
             next(error);
@@ -20,9 +24,21 @@ exports.default = {
 
     getAllProduct: async (req, res, next) => {
         try {
-            let { page, size, userId } = req.query;
+            let { page, size, userId, sortDirect } = req.query;
             let sort = req.query.sort;
-            let products = await svc.getAllProduct(page, size, sort, userId);
+            if (sort == "null") {
+                sort = "createdAt";
+            }
+            if (sortDirect == "null") {
+                sortDirect = "desc";
+            }
+            let products = await svc.getAllProduct(
+                page,
+                size,
+                sort,
+                sortDirect,
+                userId
+            );
             return res.status(200).json(products);
         } catch (error) {
             console.log(error);

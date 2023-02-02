@@ -28,7 +28,7 @@ module.exports = {
     createProduct: async (images, productDetail, categories) => {
         let createdProduct = await product.create(productDetail);
         createdProduct.dataValues.rating = 0;
-        
+
         createdProduct.dataValues.reviewCount = 0;
         createdProduct.dataValues.price = Number(
             createdProduct.dataValues.price
@@ -62,11 +62,18 @@ module.exports = {
         return createdProduct.id;
     },
 
-    getAllProduct: async (page, size, sort, userId) => {
+
+    getAllProduct: async (page, size, sortField,sortDirect, userId) => {
+        let sort = [{}]
+        sort[0][sortField]  = sortDirect
         let products = await search("*", size, page, sort);
-       
+
         for (let product of products.hits) {
-            product._source.images = product._source.images?await getImageFromFirebase(product._source.images[0]):await getImageFromFirebase("foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg")
+            product._source.images = product._source.images
+                ? await getImageFromFirebase(product._source.images[0])
+                : await getImageFromFirebase(
+                      "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
+                  );
             if (await isFavorite(userId, product._source.id)) {
                 product._source.isFavorite = true;
             } else {
@@ -74,7 +81,6 @@ module.exports = {
             }
         }
         return products;
-     
     },
 
     getProductDetail: async (id) => {
@@ -183,21 +189,7 @@ module.exports = {
     },
 };
 // -------------------------------------------------------------------------------
-let search = async (query, size, page, sort) => {
-    size = size ? size : 9;
-    let from = page ? (page - 1) * size : 0;
-    let result = await elasticNodeClient.search({
-        index: "product",
-        size,
-        from,
-        q: query,
-    });
-    if (!sort || sort == "null") {
-        sort = "createdAt";
-    }
-    result.body.hits.hits.sort((a, b) => a._source[sort] - b._source[sort]);
-    return result.body.hits;
-};
+
 let ExtractProdImg = async (images) => {
     let imagePath = images ? images[0] : null;
     images = await getImageFromFirebase(imagePath);
@@ -240,6 +232,29 @@ let createElasticDocument = async (index, id, body) => {
     });
 };
 
+let search = async (query, size, page, sort) => {
+    size = size ? size : 9;
+    let from = page ? (page - 1) * size : 0;
+    let result = await elasticNodeClient.search({
+        index: "product",
+        size,
+        from,
+        body: {
+            query: {
+                query_string: {
+                    query,
+                },
+            },
+            sort,
+        },
+    });
+    // if (!sort || sort == "null") {
+    //     sort = "createdAt";
+    // }
+    // result.body.hits.hits.sort((a, b) => a._source[sort] - b._source[sort]);
+    return result.body.hits;
+};
+
 let updateElasticDocument = async (index, id, source, params) => {
     await elasticNodeClient.update({
         index,
@@ -274,7 +289,7 @@ let isFavorite = async (userId, productId) => {
 
 let addProductCategory = async (productId, categories) => {
     for (cate of categories) {
-        cate.id = parseInt(cate.id)
+        cate.id = parseInt(cate.id);
         let source = `if (!ctx._source.containsKey('categories')) {ctx._source.categories = [];} ctx._source.categories.add(params.category)`;
         let params = { category: cate };
         updateElasticDocument("product", productId, source, params);
