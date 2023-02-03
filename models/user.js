@@ -9,6 +9,7 @@ module.exports = (sequelize, DataTypes) => {
          */
         static associate(models) {
             this.hasOne(models.table_booking);
+            this.hasOne(models.oauthauthen);
             this.belongsToMany(models.address, {
                 through: models.customer_address,
             });
@@ -56,13 +57,11 @@ module.exports = (sequelize, DataTypes) => {
             phone: {
                 type: DataTypes.STRING,
                 unique: true,
-                allowNull: false,
             },
 
             email: {
                 type: DataTypes.STRING,
                 unique: true,
-                allowNull: false,
             },
         },
         {

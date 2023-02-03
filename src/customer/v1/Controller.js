@@ -1,5 +1,46 @@
-const svc = require("./Service").default;
+const svc = require("./Service");
 exports.default = {
+    passportGoogleVerify: async (issuer, profile, cb) => {
+        try {
+            profile.email = profile.emails[0].value;
+            let user = await svc.oauthLogin(profile);
+            let loginToken = svc.getLoginToken({
+                id: user.id,
+                role: user.role,
+                username: user.username,
+            });
+            cb(null, { token: loginToken, id: user.id });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    passportFbVerify: async (accessToken, refreshToken, profile, cb) => {
+        try {
+            console.log("accessToken: ", accessToken);
+            profile.accessToken = accessToken;
+            profile.name.familyName = profile.displayName.split(" ")[0];
+            profile.name.givenName =
+                profile.displayName.split(" ")[
+                    profile.displayName.split(" ").length - 1
+                ];
+            profile.email = null;
+            let user = await svc.oauthLogin(profile);
+            let loginToken = svc.getLoginToken({
+                id: user.id,
+                role: user.role,
+                username: user.username,
+            });
+            cb(null, { token: loginToken, id: user.id });
+        } catch (error) {
+            console.log(error);
+        }
+    },
+    oauthSuccess: async (req, res, next) => {
+        res.status(200).json(req.user);
+    },
+    oauthFailure: async (req, res, next) => {
+        res.status(200).json({ error: "Cannot login" });
+    },
     login: async (req, res, next) => {
         try {
             let credential = req.body;
