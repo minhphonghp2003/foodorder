@@ -4,7 +4,7 @@ exports.default = {
         try {
             profile.email = profile.emails[0].value;
             let user = await svc.oauthLogin(profile);
-            let loginToken = svc.getLoginToken({
+            let loginToken =await svc.getLoginToken({
                 id: user.id,
                 role: user.role,
                 username: user.username,
@@ -45,7 +45,7 @@ exports.default = {
         try {
             let credential = req.body;
             let user = await svc.getValidCustomer(credential);
-            let token = svc.getLoginToken({
+            let token =await svc.getLoginToken({
                 id: user.id,
                 role: user.role,
                 username: user.username,
@@ -61,7 +61,7 @@ exports.default = {
         try {
             let customerInfo = req.body;
             let user = await svc.createCustomer(customerInfo);
-            let token = svc.getLoginToken({
+            let token =await svc.getLoginToken({
                 id: user.id,
                 role: "customer",
                 username: user.username,

@@ -61,8 +61,8 @@ module.exports = new (function () {
             );
             return;
         }),
-        (this.getLoginToken = (payload) => {
-            let token = signToken(payload);
+        (this.getLoginToken = async(payload) => {
+            let token =await signToken(payload);
             return token;
         }),
         (this.getValidCustomer = async (credential) => {
