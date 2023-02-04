@@ -5,6 +5,9 @@ const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
 
+const privateKey = fs.readFileSync(path.join(jwtConf.keyFolder, "rsa.key"));
+const publicKey = fs.readFileSync(path.join(jwtConf.keyFolder, "rsa.pub.pem"));
+
 module.exports = {
     signToken: async (payload) => {
         try {
