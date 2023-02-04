@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect ./index.js",
+    "start": "node --inspect ./index.js",
+    "dev": "nodemon --inspect ./index.js",
     "migrate": "npx sequelize-cli db:migrate",
     "migrateproduction": "npx sequelize-cli db:migrate --env production",
     "undomigrate": "npx sequelize-cli db:migrate:undo",
