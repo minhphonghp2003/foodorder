@@ -26,7 +26,7 @@ module.exports = {
             return jwt.sign(
                 payload,
                 privateKey,
-                { algorithm: "RS256",  expiresIn: "1m"  },
+                { algorithm: "RS256",  expiresIn: "7d"  },
                
             );
         } catch (err) {
