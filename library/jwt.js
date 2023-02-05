@@ -23,11 +23,11 @@ module.exports = {
                 ).Body.toString();
             }
 
-            return await jwt.sign(
+            return jwt.sign(
                 payload,
                 privateKey,
-                { algorithm: "RS256" },
-                { expiresIn: "1h" }
+                { algorithm: "RS256",  expiresIn: "1m"  },
+               
             );
         } catch (err) {
             console.log(err);
