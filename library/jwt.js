@@ -13,7 +13,6 @@ module.exports = {
     signToken: async (payload) => {
         try {
             if (appConf.isAws) {
-                console.log("yes");
                 privateKey = (
                     await s3
                         .getObject({
@@ -24,7 +23,7 @@ module.exports = {
                 ).Body.toString();
             }
 
-            return jwt.sign(
+            return await jwt.sign(
                 payload,
                 privateKey,
                 { algorithm: "RS256" },
