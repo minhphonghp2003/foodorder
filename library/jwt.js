@@ -31,6 +31,7 @@ module.exports = {
                 { expiresIn: "1h" }
             );
         } catch (err) {
+            console.log(err);
             throw new Error(err);
         }
     },
