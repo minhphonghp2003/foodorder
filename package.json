@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/minhphonghp2003/restaurant#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^7.13.0",
+    "@elastic/elasticsearch": "7.10",
     "aws-sdk": "^2.1309.0",
     "bcrypt": "^5.1.0",
     "connect-sqlite3": "^0.9.13",
