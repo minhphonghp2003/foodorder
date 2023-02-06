@@ -45,6 +45,17 @@ exports.default = {
             next(error);
         }
     },
+    getProduct: async (req, res, next) => {
+        try {
+            let id = req.params.id;
+            let productDetail = await svc.getProductDetail(id);
+            return res.status(200).json(productDetail);
+        } catch (error) {
+            console.log(error);
+            next(error);
+        }
+    },
+
 
     updateProduct: async (req, res, next) => {
         try {
@@ -119,17 +130,6 @@ exports.default = {
             await svc.deleteCategory(id);
             return res.status(200).json("done");
         } catch (error) {
-            next(error);
-        }
-    },
-
-    getProduct: async (req, res, next) => {
-        try {
-            let id = req.params.id;
-            let productDetail = await svc.getProductDetail(id);
-            return res.status(200).json(productDetail);
-        } catch (error) {
-            console.log(error);
             next(error);
         }
     },

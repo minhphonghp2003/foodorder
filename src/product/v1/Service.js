@@ -62,11 +62,10 @@ module.exports = {
         return createdProduct.id;
     },
 
-
-    getAllProduct: async (page, size, sortField,sortDirect, userId) => {
-        let sort = [{}]
-        sort[0][sortField]  = sortDirect
-        let products = await search("*", size, page, sort);
+    getAllProduct: async (page, size, sortField, sortDirect, userId) => {
+        let sort = [{}];
+        sort[0][sortField] = sortDirect;
+        let products = await queryStringSearch("*", size, page, sort);
 
         for (let product of products.hits) {
             product._source.images = product._source.images
@@ -104,11 +103,24 @@ module.exports = {
                 },
             ],
         });
-        for (let i of detail.dataValues.images) {
+        let relatedProducts = await getRelatedProduct(
+            detail.dataValues.categories
+        );
+        let relatedImages = [];
+        for (let r of relatedProducts.hits) {
+            r._source.images = r._source.images
+                ? { link: r._source.images[0] }
+                : { link: null };
+            relatedImages.push(r._source.images);
+        }
+
+        for (let i of [...detail.dataValues.images, ...relatedImages]) {
             i.link = await getImageFromFirebase(i.link);
         }
-        return { detail };
+
+        return { detail, relatedProducts };
     },
+
     updateProduct: async (id, field) => {
         await product.update(field, {
             where: { id },
@@ -189,6 +201,19 @@ module.exports = {
     },
 };
 // -------------------------------------------------------------------------------
+let getRelatedProduct = async (categories) => {
+    let cateQuery = [];
+
+    for (let cate of categories) {
+        let name = cate.dataValues.name;
+        cateQuery.push(name);
+    }
+    return await queryStringSearch(
+        `categories.name = ${cateQuery.join(" OR ")}`,
+        4,
+        1
+    );
+};
 
 let ExtractProdImg = async (images) => {
     let imagePath = images ? images[0] : null;
@@ -232,7 +257,7 @@ let createElasticDocument = async (index, id, body) => {
     });
 };
 
-let search = async (query, size, page, sort) => {
+let queryStringSearch = async (query, size, page, sort) => {
     size = size ? size : 9;
     let from = page ? (page - 1) * size : 0;
     let result = await elasticNodeClient.search({
