@@ -13,17 +13,14 @@ module.exports = (sequelize, DataTypes) => {
       this.belongsTo(models.payment)
       this.belongsTo(models.size)
       this.belongsTo(models.address)
+      this.belongsToMany(models.addons,{through:models.product_addons})
     }
   }
   order.init({
-    prodId: {
-      allowNull: false,
-      type: DataTypes.UUID
-    },
-    cusId: {
-      allowNull: false,
-      type: DataTypes.UUID
-    },
+   id:{
+    type:DataTypes.UUID,
+    primaryKey:true,
+   }, 
     quanity: {
       type: DataTypes.INTEGER,
       allowNull: false

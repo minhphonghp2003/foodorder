@@ -56,7 +56,6 @@ exports.default = {
         }
     },
 
-
     updateProduct: async (req, res, next) => {
         try {
             let role = req.authData.role;
@@ -84,6 +83,30 @@ exports.default = {
             await svc.deleteProduct(id);
             return res.status(200).json({ isDone: true });
         } catch (error) {
+            next(error);
+        }
+    },
+    createAddons: async (req, res, next) => {
+        try {
+            let role = req.authData.role;
+            if (role !== "admin" && role !== "staff") {
+                throw new Error("Not allowed");
+            }
+            let image = req.file;
+            let { name, price } = req.body;
+            let addon = await svc.createAddons(image, name, price);
+            return res.status(200).json(addon);
+        } catch (error) {
+            console.log(error);
+            next(error);
+        }
+    },
+    getALlAddons: async (req, res, next) => {
+        try {
+            let addons = await svc.getAllAddons();
+            return res.status(200).json(addons);
+        } catch (error) {
+            console.log(error);
             next(error);
         }
     },

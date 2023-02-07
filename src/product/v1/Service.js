@@ -6,6 +6,7 @@ const {
     product_review,
     product_category,
     reviewer,
+    addons,
     sequelize,
     favorite,
 } = require("../../../models");
@@ -135,6 +136,27 @@ module.exports = {
             },
         });
     },
+    createAddons: async (image, name, price) => {
+        let imageId = (await createImage(image)).id;
+        let createdAddons = await addons.create({
+            imageId,
+            name,
+            price,
+        });
+
+        return createdAddons.id;
+    },
+
+    getAllAddons: async () => {
+        let AllAddons = await addons.findAll({ include: "image" });
+        for (let a of AllAddons) {
+            a.dataValues.image = await getImageFromFirebase(
+                a.dataValues.image.link
+            );
+        }
+        return AllAddons;
+    },
+
     createCategory: async (name, image) => {
         let imageId = await createImage(image);
         let categoryId = (await category.create({ name, imageId })).id;
