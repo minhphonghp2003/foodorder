@@ -110,14 +110,6 @@ exports.default = {
             next(error);
         }
     },
-    getAllCategory: async (req, res, next) => {
-        try {
-            let categories = await svc.getAllCategory();
-            return res.status(200).json(categories);
-        } catch (error) {
-            next(error);
-        }
-    },
 
     createCategory: async (req, res, next) => {
         try {
@@ -134,10 +126,18 @@ exports.default = {
         }
     },
 
+    getAllCategory: async (req, res, next) => {
+        try {
+            let categories = await svc.getAllCategory();
+            return res.status(200).json(categories);
+        } catch (error) {
+            next(error);
+        }
+    },
     getProductByCategory: async (req, res, next) => {
         try {
-            let { id } = req.query;
-            let categoryAndProduct = await svc.getProductByCategory(id);
+            let query = req.query;
+            let categoryAndProduct = await svc.getProductByCategory(query);
             return res.status(200).json(categoryAndProduct);
         } catch (error) {
             next(error);

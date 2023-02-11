@@ -67,19 +67,7 @@ module.exports = {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
         let products = await queryStringSearch("*", size, page, sort);
-
-        for (let product of products.hits) {
-            product._source.images = product._source.images
-                ? await getImageFromFirebase(product._source.images[0])
-                : await getImageFromFirebase(
-                      "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
-                  );
-            if (await isFavorite(userId, product._source.id)) {
-                product._source.isFavorite = true;
-            } else {
-                product._source.isFavorite = false;
-            }
-        }
+        await ExtractProdImg(products,userId)
         return products;
     },
 
@@ -163,36 +151,42 @@ module.exports = {
         return categoryId;
     },
 
-    getProductByCategory: async (id) => {
-        let detail = await category.findOne({
-            where: {
-                id,
-            },
+    getProductByCategory: async ({ id, size, page, sortField, sortDirect }) => {
+        let sort = [{}];
+        sort[0][sortField] = sortDirect;
+        let result = await queryStringSearch(`categories.id:${id}`,size,page,sort)
+        await ExtractProdImg(result,null)
+        return result;
 
-            include: [
-                {
-                    model: product,
+        // let detail = await category.findOne({
+        //     where: {
+        //         id,
+        //     },
 
-                    attributes: ["id", "name", "price"],
-                    order: [["createdAt", "DESC"]],
-                    include: [
-                        {
-                            model: product_review,
-                            attributes: ["rating"],
-                        },
-                        {
-                            model: image,
-                            attributes: ["link"],
-                        },
-                    ],
-                },
-            ],
-        });
+        //     include: [
+        //         {
+        //             model: product,
 
-        for (let product of detail.dataValues.products) {
-            await ExtractProdImg(product);
-        }
-        return detail;
+        //             attributes: ["id", "name", "price"],
+        //             order: [["createdAt", "DESC"]],
+        //             include: [
+        //                 {
+        //                     model: product_review,
+        //                     attributes: ["rating"],
+        //                 },
+        //                 {
+        //                     model: image,
+        //                     attributes: ["link"],
+        //                 },
+        //             ],
+        //         },
+        //     ],
+        // });
+
+        // for (let product of detail.dataValues.products) {
+        //     await ExtractProdImg(product.images);
+        // }
+        // return detail;
     },
     getAllCategory: async () => {
         let cates = await category.findAll({
@@ -223,6 +217,7 @@ module.exports = {
     },
 };
 // -------------------------------------------------------------------------------
+
 let getRelatedProduct = async (categories) => {
     let cateQuery = [];
 
@@ -237,9 +232,19 @@ let getRelatedProduct = async (categories) => {
     );
 };
 
-let ExtractProdImg = async (images) => {
-    let imagePath = images ? images[0] : null;
-    images = await getImageFromFirebase(imagePath);
+let ExtractProdImg = async (products,userId) => {
+     for (let product of products.hits) {
+            product._source.images = product._source.images
+                ? await getImageFromFirebase(product._source.images[0])
+                : await getImageFromFirebase(
+                      "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
+                  );
+            if (await isFavorite(userId, product._source.id)) {
+                product._source.isFavorite = true;
+            } else {
+                product._source.isFavorite = false;
+            }
+        }
 };
 
 let avgCalc = (array, property) => {
@@ -279,6 +284,34 @@ let createElasticDocument = async (index, id, body) => {
     });
 };
 
+let queryStringWithFilter = async (query, size, page, sort, filter) => {
+    size = size ? size : 9;
+    let from = page ? (page - 1) * size : 0;
+    let result = await elasticNodeClient.search({
+        index: "product",
+        size,
+        from,
+        body: {
+            sort,
+            query: {
+                bool: {
+                    must: {
+                        query_string: {
+                            query,
+                        },
+                    },
+                    filter: {
+                        range: {
+                            price: { gte: 99997, lte: 999999 },
+                        },
+                    },
+                },
+            },
+        },
+    });
+    return result;
+};
+
 let queryStringSearch = async (query, size, page, sort) => {
     size = size ? size : 9;
     let from = page ? (page - 1) * size : 0;
@@ -295,6 +328,7 @@ let queryStringSearch = async (query, size, page, sort) => {
             sort,
         },
     });
+
     // if (!sort || sort == "null") {
     //     sort = "createdAt";
     // }
