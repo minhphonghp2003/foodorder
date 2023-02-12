@@ -22,29 +22,6 @@ exports.default = {
         }
     },
 
-    getAllProduct: async (req, res, next) => {
-        try {
-            let { page, size, userId, sortDirect } = req.query;
-            let sort = req.query.sort;
-            if (sort == "null") {
-                sort = "createdAt";
-            }
-            if (sortDirect == "null") {
-                sortDirect = "desc";
-            }
-            let products = await svc.getAllProduct(
-                page,
-                size,
-                sort,
-                sortDirect,
-                userId
-            );
-            return res.status(200).json(products);
-        } catch (error) {
-            console.log(error);
-            next(error);
-        }
-    },
     getProduct: async (req, res, next) => {
         try {
             let id = req.params.id;
@@ -52,6 +29,15 @@ exports.default = {
             return res.status(200).json(productDetail);
         } catch (error) {
             console.log(error);
+            next(error);
+        }
+    },
+    getAllProduct: async (req, res, next) => {
+        try {
+            let query = req.query;
+            let products = await svc.getAllProduct(query);
+            return res.status(200).json(products);
+        } catch (error) {
             next(error);
         }
     },
@@ -130,15 +116,6 @@ exports.default = {
         try {
             let categories = await svc.getAllCategory();
             return res.status(200).json(categories);
-        } catch (error) {
-            next(error);
-        }
-    },
-    getProductByCategory: async (req, res, next) => {
-        try {
-            let query = req.query;
-            let categoryAndProduct = await svc.getProductByCategory(query);
-            return res.status(200).json(categoryAndProduct);
         } catch (error) {
             next(error);
         }

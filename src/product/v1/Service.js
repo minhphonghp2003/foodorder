@@ -63,12 +63,24 @@ module.exports = {
         return createdProduct.id;
     },
 
-    getAllProduct: async (page, size, sortField, sortDirect, userId) => {
+    getAllProduct: async ({
+        categoryId,
+        size,
+        page,
+        sortField,
+        sortDirect,
+        userId,
+    }) => {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
-        let products = await queryStringSearch("*", size, page, sort);
-        await ExtractProdImg(products,userId)
-        return products;
+        let result = await queryStringSearch(
+            `categories.id:${categoryId }`,
+            size,
+            page,
+            sort
+        );
+        await ExtractProdImgAndFav(result, userId);
+        return result;
     },
 
     getProductDetail: async (id) => {
@@ -151,43 +163,6 @@ module.exports = {
         return categoryId;
     },
 
-    getProductByCategory: async ({ id, size, page, sortField, sortDirect }) => {
-        let sort = [{}];
-        sort[0][sortField] = sortDirect;
-        let result = await queryStringSearch(`categories.id:${id}`,size,page,sort)
-        await ExtractProdImg(result,null)
-        return result;
-
-        // let detail = await category.findOne({
-        //     where: {
-        //         id,
-        //     },
-
-        //     include: [
-        //         {
-        //             model: product,
-
-        //             attributes: ["id", "name", "price"],
-        //             order: [["createdAt", "DESC"]],
-        //             include: [
-        //                 {
-        //                     model: product_review,
-        //                     attributes: ["rating"],
-        //                 },
-        //                 {
-        //                     model: image,
-        //                     attributes: ["link"],
-        //                 },
-        //             ],
-        //         },
-        //     ],
-        // });
-
-        // for (let product of detail.dataValues.products) {
-        //     await ExtractProdImg(product.images);
-        // }
-        // return detail;
-    },
     getAllCategory: async () => {
         let cates = await category.findAll({
             include: ["image"],
@@ -232,19 +207,19 @@ let getRelatedProduct = async (categories) => {
     );
 };
 
-let ExtractProdImg = async (products,userId) => {
-     for (let product of products.hits) {
-            product._source.images = product._source.images
-                ? await getImageFromFirebase(product._source.images[0])
-                : await getImageFromFirebase(
-                      "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
-                  );
-            if (await isFavorite(userId, product._source.id)) {
-                product._source.isFavorite = true;
-            } else {
-                product._source.isFavorite = false;
-            }
+let ExtractProdImgAndFav = async (products, userId) => {
+    for (let product of products.hits) {
+        product._source.images = product._source.images
+            ? await getImageFromFirebase(product._source.images[0])
+            : await getImageFromFirebase(
+                  "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
+              );
+        if (await isFavorite(userId, product._source.id)) {
+            product._source.isFavorite = true;
+        } else {
+            product._source.isFavorite = false;
         }
+    }
 };
 
 let avgCalc = (array, property) => {
@@ -329,10 +304,6 @@ let queryStringSearch = async (query, size, page, sort) => {
         },
     });
 
-    // if (!sort || sort == "null") {
-    //     sort = "createdAt";
-    // }
-    // result.body.hits.hits.sort((a, b) => a._source[sort] - b._source[sort]);
     return result.body.hits;
 };
 

@@ -12,7 +12,6 @@ router.post("/review",  ctrler.createReview);
 router.get("/", ctrler.getAllProduct);
 router.get("/alladdon", ctrler.getALlAddons);
 router.get("/detail/:id", ctrler.getProduct);
-router.get("/category", ctrler.getProductByCategory);
 router.get("/category/all", ctrler.getAllCategory);
 // router.get("/search", ctrler.search);
 router.put("/",checkAuth,  ctrler.updateProduct);
