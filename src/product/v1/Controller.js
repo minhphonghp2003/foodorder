@@ -1,5 +1,6 @@
 const svc = require("./Service");
 const { v4, parse } = require("uuid");
+const axios = require("axios").default;
 exports.default = {
     createProduct: async (req, res, next) => {
         try {
@@ -151,6 +152,22 @@ exports.default = {
         }
     },
 
+    onlPay: async (req, res, next) => {
+        let info = {
+            "id": "204727",  
+            "name": "YOMOST Bac Ha&Viet Quat 170ml",  
+            "description": "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+            "category": "beverage",
+            "imageUrl":"https://momo.vn/uploads/product1.jpg",
+            "manufacturer":"Vinamilk",
+            "price": 11000,               
+            "quantity": 5,
+            "unit":"hộp",
+            "totalPrice": 55000,
+            "taxAmount":"200"
+          }
+       
+    },
     // search: async (req, res, next) => {
     //     try {
     //         let {  keyword, size,page,sort } = req.query;

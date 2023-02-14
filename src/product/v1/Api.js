@@ -9,6 +9,7 @@ router.post("/",checkAuth, upload.array("images"), ctrler.createProduct);
 router.post("/addon",checkAuth, upload.single("image"), ctrler.createAddons);
 router.post("/category",checkAuth,upload.single("image"),  ctrler.createCategory);
 router.post("/review",  ctrler.createReview);
+router.post("onlinepay", ctrler.onlPay)
 router.get("/", ctrler.getAllProduct);
 router.get("/alladdon", ctrler.getALlAddons);
 router.get("/detail/:id", ctrler.getProduct);
