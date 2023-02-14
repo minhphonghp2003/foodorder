@@ -126,6 +126,14 @@ module.exports = {
         await product.update(field, {
             where: { id },
         });
+        field.price = parseInt(field.price)
+        await elasticNodeClient.update({
+            index:"product",
+            id,
+            body:{
+                doc:field
+            }
+        })
         return;
     },
 
@@ -135,6 +143,10 @@ module.exports = {
                 id,
             },
         });
+        await elasticNodeClient.delete({
+            index:"product",
+            id,
+        })
     },
     createAddons: async (image, name, price) => {
         let imageId = (await createImage(image)).id;
@@ -176,6 +188,7 @@ module.exports = {
         return cates;
     },
     deleteCategory: async (id) => {
+       
         return await category.destroy({ where: { id } });
     },
 
@@ -259,33 +272,6 @@ let createElasticDocument = async (index, id, body) => {
     });
 };
 
-let queryStringWithFilter = async (query, size, page, sort, filter) => {
-    size = size ? size : 9;
-    let from = page ? (page - 1) * size : 0;
-    let result = await elasticNodeClient.search({
-        index: "product",
-        size,
-        from,
-        body: {
-            sort,
-            query: {
-                bool: {
-                    must: {
-                        query_string: {
-                            query,
-                        },
-                    },
-                    filter: {
-                        range: {
-                            price: { gte: 99997, lte: 999999 },
-                        },
-                    },
-                },
-            },
-        },
-    });
-    return result;
-};
 
 let queryStringSearch = async (query, size, page, sort) => {
     size = size ? size : 9;
@@ -322,6 +308,21 @@ let updateElasticDocument = async (index, id, source, params) => {
         },
     });
 };
+
+let updateByQueryElastic = async(index,inline,params)=>{
+await elasticNodeClient.updateByQuery({
+    index,
+    body:{
+        query: {
+            match_all: {}
+          },
+   
+        script:{
+            inline:inline,
+        }
+    }
+})
+}
 
 let isFavorite = async (userId, productId) => {
     if (!userId || userId == "null") {
