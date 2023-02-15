@@ -74,7 +74,7 @@ module.exports = {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
         let result = await queryStringSearch(
-            `categories.id:${categoryId }`,
+            `categories.id:${categoryId}`,
             size,
             page,
             sort
@@ -126,14 +126,14 @@ module.exports = {
         await product.update(field, {
             where: { id },
         });
-        field.price = parseInt(field.price)
+        field.price = parseInt(field.price);
         await elasticNodeClient.update({
-            index:"product",
+            index: "product",
             id,
-            body:{
-                doc:field
-            }
-        })
+            body: {
+                doc: field,
+            },
+        });
         return;
     },
 
@@ -144,9 +144,9 @@ module.exports = {
             },
         });
         await elasticNodeClient.delete({
-            index:"product",
+            index: "product",
             id,
-        })
+        });
     },
     createAddons: async (image, name, price) => {
         let imageId = (await createImage(image)).id;
@@ -188,7 +188,6 @@ module.exports = {
         return cates;
     },
     deleteCategory: async (id) => {
-       
         return await category.destroy({ where: { id } });
     },
 
@@ -202,6 +201,19 @@ module.exports = {
             productId,
         });
         return body;
+    },
+
+    search: async ({ keyword, size, page, sortField, sortDirect, userId }) => {
+        let sort = [{}];
+        sort[0][sortField] = sortDirect;
+        let result = await queryStringSearch(
+            `*${keyword}*`,
+            size,
+            page,
+            sort
+        );
+        await ExtractProdImgAndFav(result, userId);
+        return result;
     },
 };
 // -------------------------------------------------------------------------------
@@ -272,7 +284,6 @@ let createElasticDocument = async (index, id, body) => {
     });
 };
 
-
 let queryStringSearch = async (query, size, page, sort) => {
     size = size ? size : 9;
     let from = page ? (page - 1) * size : 0;
@@ -309,20 +320,20 @@ let updateElasticDocument = async (index, id, source, params) => {
     });
 };
 
-let updateByQueryElastic = async(index,inline,params)=>{
-await elasticNodeClient.updateByQuery({
-    index,
-    body:{
-        query: {
-            match_all: {}
-          },
-   
-        script:{
-            inline:inline,
-        }
-    }
-})
-}
+let updateByQueryElastic = async (index, inline, params) => {
+    await elasticNodeClient.updateByQuery({
+        index,
+        body: {
+            query: {
+                match_all: {},
+            },
+
+            script: {
+                inline: inline,
+            },
+        },
+    });
+};
 
 let isFavorite = async (userId, productId) => {
     if (!userId || userId == "null") {

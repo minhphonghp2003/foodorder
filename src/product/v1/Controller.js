@@ -168,13 +168,12 @@ exports.default = {
           }
        
     },
-    // search: async (req, res, next) => {
-    //     try {
-    //         let {  keyword, size,page,sort } = req.query;
-    //         let result = await svc.search(keyword,size,page,sort);
-    //         return res.status(200).json(result);
-    //     } catch (error) {
-    //         next(error);
-    //     }
-    // },
+    search: async (req, res, next) => {
+        try {
+            let result = await svc.search(req.query);
+            return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
 };

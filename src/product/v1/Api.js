@@ -14,7 +14,7 @@ router.get("/", ctrler.getAllProduct);
 router.get("/alladdon", ctrler.getALlAddons);
 router.get("/detail/:id", ctrler.getProduct);
 router.get("/category/all", ctrler.getAllCategory);
-// router.get("/search", ctrler.search);
+router.get("/search", ctrler.search);
 router.put("/",checkAuth,  ctrler.updateProduct);
 router.delete("/",checkAuth,  ctrler.deleteProduct);
 router.delete("/category",checkAuth,  ctrler.deleteCategory);
