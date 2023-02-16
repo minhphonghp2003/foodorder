@@ -23,7 +23,6 @@ const {
 } = require("firebase/storage");
 const storage = getStorage(app);
 
-// avg = m/(m+1)*preAvg + d/m+1
 
 module.exports = {
     createProduct: async (images, productDetail, categories) => {
@@ -97,10 +96,6 @@ module.exports = {
                 {
                     model: image,
                     attributes: ["link"],
-                },
-                {
-                    model: reviewer,
-                    attributes: ["name"],
                 },
             ],
         });
@@ -191,6 +186,7 @@ module.exports = {
         return await category.destroy({ where: { id } });
     },
 
+// avg = m/(m+1)*preAvg + d/m+1
     createReview: async (productId, rating, name, email, content) => {
         let newReviewer = await reviewer.create({ name, email });
         let reviewerId = newReviewer.dataValues.id;
@@ -200,18 +196,28 @@ module.exports = {
             reviewerId,
             productId,
         });
+        let product = (await queryStringSearch(`id:${productId}`,1,1) ).hits[0]._source;
+        let preAvg = product.rating
+        let preCount = product.reviewCount
+        let currAvg = (preCount)/(preCount+1)*preAvg + rating/(preCount+1)
+        let updateSource = "ctx._source.rating = params.currAvg; ctx._source.reviewCount++"
+        let params = {currAvg}
+        await updateElasticDocument("product",productId,updateSource,params)
         return body;
+    },
+    getReviews: async (productId) => {
+        return await product_review.findAll({
+            where: {
+                productId,
+            },
+            include: "reviewer",
+        });
     },
 
     search: async ({ keyword, size, page, sortField, sortDirect, userId }) => {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
-        let result = await queryStringSearch(
-            `*${keyword}*`,
-            size,
-            page,
-            sort
-        );
+        let result = await queryStringSearch(`*${keyword}*`, size, page, sort);
         await ExtractProdImgAndFav(result, userId);
         return result;
     },
@@ -244,12 +250,6 @@ let ExtractProdImgAndFav = async (products, userId) => {
         } else {
             product._source.isFavorite = false;
         }
-    }
-};
-
-let avgCalc = (array, property) => {
-    if (array != null) {
-        return array.reduce((p, c) => p + c[property], 0) / array.length;
     }
 };
 

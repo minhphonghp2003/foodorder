@@ -7,7 +7,9 @@ module.exports = (sequelize, DataTypes) => {
          * This method is not a part of Sequelize lifecycle.
          * The `models/index` file will call this method automatically.
          */
-        static associate(models) {}
+        static associate(models) {
+            this.belongsTo(models.reviewer)
+        }
     }
     product_review.init(
         {
@@ -17,8 +19,6 @@ module.exports = (sequelize, DataTypes) => {
                 defaultValue: DataTypes.UUIDV4,
             },
 
-            productId: DataTypes.UUID,
-            reviewerId: DataTypes.UUID,
             rating: DataTypes.INTEGER,
             content: DataTypes.TEXT,
             createdAt: {

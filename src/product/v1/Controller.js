@@ -152,6 +152,11 @@ exports.default = {
         }
     },
 
+    getReviews: async(req,res,next) =>{
+        let reviews = await svc.getReviews(req.query.productId);
+        return res.status(200).json(reviews)
+    },
+
     onlPay: async (req, res, next) => {
         let info = {
             "id": "204727",  
