@@ -31,6 +31,10 @@ router.get("/email", ctrler.getEmail);
 router.post("/login", ctrler.login);
 router.post("/register", ctrler.register);
 router.post("/address", checkAuth, ctrler.createCustomerAddress);
+router.post("/webhook", (req,res)=>{
+    console.log("webhook");
+    res.send("webhook")
+})
 router.delete("/address", checkAuth, ctrler.deletaAddress);
 router.post("/emailentry", ctrler.createEmailForChange);
 router.put("/password", ctrler.changePassword);
