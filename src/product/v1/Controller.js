@@ -73,31 +73,6 @@ exports.default = {
             next(error);
         }
     },
-    createAddons: async (req, res, next) => {
-        try {
-            let role = req.authData.role;
-            if (role !== "admin" && role !== "staff") {
-                throw new Error("Not allowed");
-            }
-            let image = req.file;
-            let { name, price } = req.body;
-            let addon = await svc.createAddons(image, name, price);
-            return res.status(200).json(addon);
-        } catch (error) {
-            console.log(error);
-            next(error);
-        }
-    },
-    getALlAddons: async (req, res, next) => {
-        try {
-            let addons = await svc.getAllAddons();
-            return res.status(200).json(addons);
-        } catch (error) {
-            console.log(error);
-            next(error);
-        }
-    },
-
     createCategory: async (req, res, next) => {
         try {
             let role = req.authData.role;
@@ -152,26 +127,25 @@ exports.default = {
         }
     },
 
-    getReviews: async(req,res,next) =>{
+    getReviews: async (req, res, next) => {
         let reviews = await svc.getReviews(req.query.productId);
-        return res.status(200).json(reviews)
+        return res.status(200).json(reviews);
     },
 
     onlPay: async (req, res, next) => {
         let info = {
-            "id": "204727",  
-            "name": "YOMOST Bac Ha&Viet Quat 170ml",  
-            "description": "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-            "category": "beverage",
-            "imageUrl":"https://momo.vn/uploads/product1.jpg",
-            "manufacturer":"Vinamilk",
-            "price": 11000,               
-            "quantity": 5,
-            "unit":"hộp",
-            "totalPrice": 55000,
-            "taxAmount":"200"
-          }
-       
+            id: "204727",
+            name: "YOMOST Bac Ha&Viet Quat 170ml",
+            description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+            category: "beverage",
+            imageUrl: "https://momo.vn/uploads/product1.jpg",
+            manufacturer: "Vinamilk",
+            price: 11000,
+            quantity: 5,
+            unit: "hộp",
+            totalPrice: 55000,
+            taxAmount: "200",
+        };
     },
     search: async (req, res, next) => {
         try {

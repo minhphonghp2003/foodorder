@@ -6,13 +6,11 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 const router = express.Router();
 router.post("/",checkAuth, upload.array("images"), ctrler.createProduct);
-router.post("/addon",checkAuth, upload.single("image"), ctrler.createAddons);
 router.post("/category",checkAuth,upload.single("image"),  ctrler.createCategory);
 router.post("/review",  ctrler.createReview);
 router.post("onlinepay", ctrler.onlPay)
 router.get("/", ctrler.getAllProduct);
 router.get("/review", ctrler.getReviews);
-router.get("/alladdon", ctrler.getALlAddons);
 router.get("/detail/:id", ctrler.getProduct);
 router.get("/category/all", ctrler.getAllCategory);
 router.get("/search", ctrler.search);

@@ -7,6 +7,7 @@ exports.default = {
             let result = await svc.upsertCart(productId, userId, quanity);
             return res.status(200).send(result);
         } catch (error) {
+            console.log(error);
             next(error);
         }
     },

@@ -23,7 +23,6 @@ const {
 } = require("firebase/storage");
 const storage = getStorage(app);
 
-
 module.exports = {
     createProduct: async (images, productDetail, categories) => {
         let createdProduct = await product.create(productDetail);
@@ -143,27 +142,6 @@ module.exports = {
             id,
         });
     },
-    createAddons: async (image, name, price) => {
-        let imageId = (await createImage(image)).id;
-        let createdAddons = await addons.create({
-            imageId,
-            name,
-            price,
-        });
-
-        return createdAddons.id;
-    },
-
-    getAllAddons: async () => {
-        let AllAddons = await addons.findAll({ include: "image" });
-        for (let a of AllAddons) {
-            a.dataValues.image = await getImageFromFirebase(
-                a.dataValues.image.link
-            );
-        }
-        return AllAddons;
-    },
-
     createCategory: async (name, image) => {
         let imageId = await createImage(image);
         let categoryId = (await category.create({ name, imageId })).id;
@@ -186,7 +164,7 @@ module.exports = {
         return await category.destroy({ where: { id } });
     },
 
-// avg = m/(m+1)*preAvg + d/m+1
+    // avg = m/(m+1)*preAvg + d/m+1
     createReview: async (productId, rating, name, email, content) => {
         let newReviewer = await reviewer.create({ name, email });
         let reviewerId = newReviewer.dataValues.id;
@@ -196,13 +174,16 @@ module.exports = {
             reviewerId,
             productId,
         });
-        let product = (await queryStringSearch(`id:${productId}`,1,1) ).hits[0]._source;
-        let preAvg = product.rating
-        let preCount = product.reviewCount
-        let currAvg = (preCount)/(preCount+1)*preAvg + rating/(preCount+1)
-        let updateSource = "ctx._source.rating = params.currAvg; ctx._source.reviewCount++"
-        let params = {currAvg}
-        await updateElasticDocument("product",productId,updateSource,params)
+        let product = (await queryStringSearch(`id:${productId}`, 1, 1)).hits[0]
+            ._source;
+        let preAvg = product.rating;
+        let preCount = product.reviewCount;
+        let currAvg =
+            (preCount / (preCount + 1)) * preAvg + rating / (preCount + 1);
+        let updateSource =
+            "ctx._source.rating = params.currAvg; ctx._source.reviewCount++";
+        let params = { currAvg };
+        await updateElasticDocument("product", productId, updateSource, params);
         return body;
     },
     getReviews: async (productId) => {
