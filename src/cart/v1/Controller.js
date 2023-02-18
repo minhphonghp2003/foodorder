@@ -1,5 +1,14 @@
 const svc = require("./Service").default;
 exports.default = {
+    stripeCheckout: async (req, res, next) => {
+        try {
+            let {products, customerDetails} = req.body;
+            let url = await svc.stripeCheckout(products, customerDetails);
+            return res.status(200).json(url);
+        } catch (error) {
+            next(error);
+        }
+    },
     upsertCart: async (req, res, next) => {
         try {
             let userId = req.authData.id;
@@ -23,13 +32,13 @@ exports.default = {
         }
     },
 
-    getCart: async(req,res,next) =>{
+    getCart: async (req, res, next) => {
         try {
-           let userId = req.authData.id 
-           let productInCart = await svc.getCart(userId)
-           return res.status(200).json(productInCart)
+            let userId = req.authData.id;
+            let productInCart = await svc.getCart(userId);
+            return res.status(200).json(productInCart);
         } catch (error) {
-           next(error) 
+            next(error);
         }
-    }
+    },
 };
