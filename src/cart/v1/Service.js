@@ -23,27 +23,22 @@ exports.default = {
     },
 
     getCart: async (userId) => {
-        let productInCart = await user.findAll({
-            where: { id: userId },
+        
+        let productInCart = await cart.findAll({
+            where: { userId },
 
-            attributes: [],
             include: [
                 {
-                    model: cart,
-                    include: [{ model: product, include: image }],
+                    model: product,
+                    include: image,
                 },
             ],
-            // include: [{ model: product,attributes:["name","price","id"], include:image }],
-            raw: true,
-            nest: true,
+            
         });
-        console.log(productInCart);
         for (let cart of productInCart) {
-            cart.carts.product.images = cart.carts.product.images.link
-                ? await getImageFromFirebase(cart.carts.product.images.link)
-                : null;
-            // cart.carts.product.quanity = cart.products.cart.quanity;
-            // delete cart.products.cart;
+            cart.dataValues.product.dataValues.images = await getImageFromFirebase(
+                cart.product.dataValues.images[0].link
+            );
         }
         return productInCart;
     },
