@@ -1,10 +1,16 @@
-const svc = require("./Service").default;
+const svc = require("./Service");
 exports.default = {
-    stripeCheckout: async (req, res, next) => {
+    newPayment: async (req, res, next) => {
         try {
-            let {products, customerDetails} = req.body;
+            let {products, customerDetails, method} = req.body;
+            if(method == "offline"){
+                return res.status(200).json("Done payment")
+            }
+            else if(method == 'stripe'){
             let url = await svc.stripeCheckout(products, customerDetails);
             return res.status(200).json(url);
+            }
+            return res.status(500).json("error")
         } catch (error) {
             next(error);
         }
