@@ -9,39 +9,42 @@ exports.default = {
             email ,
             amount:req.query.vnp_Amount
           })
-        //   TODO: add order
     res.status(200).json("Done");
     },
     newPayment: async (req, res, next) => {
+        let userId = req.authData.id
+        let {method, products, customerDetail } = req.body;
         try {
-            let {method } = req.body;
             if (method == "offline") {
+                await svc.updateBilling("unpaid",userId,products)
                 return res.status(200).json("Done payment");
             } else if (method == "stripe") {
-                let {products,customerDetails} = req.body
-                let url = await svc.stripeCheckout(products, customerDetails);
+                await svc.updateBilling("paid",userId,products)
+                let url = await svc.stripeCheckout(products, customerDetail);
                 return res.status(200).json(url);
             } else if (method == "vnpay") {
+                await svc.updateBilling("paid",userId,products)
                 var ipAddr =
                     req.headers["x-forwarded-for"] ||
                     req.connection.remoteAddress ||
                     req.socket.remoteAddress ||
                     req.connection.socket.remoteAddress||
                     "127.0.0.1";
-                let information = {ipAddr,...req.body}
+                let information = {ipAddr,products, customerDetail, userId}
                 let url = await svc.vnpayCheckout(information);
                 return res.status(200).json(url);
             }
             return res.status(500).json("error");
         } catch (error) {
+            await svc.updateBilling(null,userId,products)
             next(error);
         }
     },
     upsertCart: async (req, res, next) => {
         try {
             let userId = req.authData.id;
-            let { productId, quanity } = req.body;
-            let result = await svc.upsertCart(productId, userId, quanity);
+            let { productId, quanity: quantity } = req.body;
+            let result = await svc.upsertCart(productId, userId, quantity);
             return res.status(200).send(result);
         } catch (error) {
             console.log(error);

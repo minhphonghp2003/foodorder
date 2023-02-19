@@ -13,6 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     }
     cart.init(
         {
+            billing:{
+                type:DataTypes.STRING,
+            },
             quantity: {
                 type: DataTypes.INTEGER,
                 allowNull: false,

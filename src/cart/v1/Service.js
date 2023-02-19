@@ -5,11 +5,25 @@ const stripeConfig = require("../../../config/stripe");
 const vnpayConfig = require("../../../config/vnpay");
 const storage = getStorage(app);
 const stripe = require("stripe")(stripeConfig.sk_test);
+const { Op } = require("sequelize");
+
 
 module.exports = new (function () {
+    this.updateBilling = async (value, userId, products) => {
+        for (let product of products) {
+            await cart.update(
+                { billing: value },
+                {
+                    where: {
+                        userId,
+                        productId: product.id,
+                    },
+                }
+            );
+        }
+    };
     this.vnpayCheckout = async (information) => {
-        var ipAddr = information.ipAddr
-
+        var ipAddr = information.ipAddr;
         var tmnCode = vnpayConfig.vnp_TmnCode;
         var secretKey = vnpayConfig.vnp_HashSecret;
         var vnpUrl = vnpayConfig.vnp_Url;
@@ -26,31 +40,25 @@ module.exports = new (function () {
 
         var orderId = `${hours}${minutes}${seconds}`;
         var amount = 0;
-        for (p of information.prices) {
-            amount+= parseInt(p) 
+        for (p of information.products) {
+            amount += parseInt(p.price) * parseInt(p.quantity);
         }
-        var orderInfo = information.orderDescription;
-        var orderType = information.orderType;
-        var locale = information.language;
-        if (locale === null || locale === "") {
-            locale = "vn";
-        }
+        var orderInfo = `Customer ${information.userId} has transferred money into this account. Email ${information.customerDetail.email}`;
+        var locale = "vn";
         var currCode = "VND";
         var vnp_Params = {};
         vnp_Params["vnp_Version"] = "2.1.0";
         vnp_Params["vnp_Command"] = "pay";
         vnp_Params["vnp_TmnCode"] = tmnCode;
-        // vnp_Params['vnp_Merchant'] = ''
         vnp_Params["vnp_Locale"] = locale;
         vnp_Params["vnp_CurrCode"] = currCode;
         vnp_Params["vnp_TxnRef"] = orderId;
         vnp_Params["vnp_OrderInfo"] = orderInfo;
-        vnp_Params["vnp_OrderType"] = orderType;
         vnp_Params["vnp_Amount"] = amount * 100;
         vnp_Params["vnp_ReturnUrl"] = returnUrl;
         vnp_Params["vnp_IpAddr"] = ipAddr;
         vnp_Params["vnp_CreateDate"] = createDate;
-       
+
         vnp_Params = sortObject(vnp_Params);
 
         var querystring = require("qs");
@@ -62,7 +70,7 @@ module.exports = new (function () {
         vnpUrl += "?" + querystring.stringify(vnp_Params, { encode: false });
         return vnpUrl;
     };
-    (this.stripeCheckout = async (products, customerDetails) => {
+    (this.stripeCheckout = async (products, customerDetail) => {
         let line_items = [];
         for (let p of products) {
             line_items.push({
@@ -80,15 +88,15 @@ module.exports = new (function () {
 
         const session = await stripe.checkout.sessions.create({
             line_items,
-            customer_email: customerDetails.email,
+            customer_email: customerDetail.email,
             mode: "payment",
             success_url: stripeConfig.success_url,
         });
         return session.url;
     }),
-        (this.upsertCart = async (productId, userId, quanity) => {
+        (this.upsertCart = async (productId, userId, quantity) => {
             let result = await cart.upsert(
-                { quanity, productId, userId },
+                { quantity, productId, userId },
                 { productId, userId }
             );
             return result;
@@ -103,8 +111,8 @@ module.exports = new (function () {
             return "done";
         }),
         (this.getCart = async (userId) => {
-            let productInCart = await cart.findAll({
-                where: { userId },
+            let inCartProduct = await cart.findAll({
+                where: { userId, billing: null },
 
                 include: [
                     {
@@ -113,13 +121,32 @@ module.exports = new (function () {
                     },
                 ],
             });
-            for (let cart of productInCart) {
+            let orderedProduct = await cart.findAll({
+                where: {
+                    userId,
+                    billing: {
+                        [Op.ne]: null,
+                    },
+                },
+
+                include: [
+                    {
+                        model: product,
+                        include: image,
+                    },
+                ],
+            });
+            let products = [...inCartProduct,...orderedProduct]
+            for (let cart of products) {
                 cart.dataValues.product.dataValues.images =
                     await getImageFromFirebase(
                         cart.product.dataValues.images[0].link
                     );
             }
-            return productInCart;
+            return {
+                inCart: inCartProduct,
+                ordered:orderedProduct
+            };
         });
 })();
 
@@ -134,17 +161,20 @@ let getImageFromFirebase = async (path) => {
     return null;
 };
 function sortObject(obj) {
-	var sorted = {};
-	var str = [];
-	var key;
-	for (key in obj){
-		if (obj.hasOwnProperty(key)) {
-		str.push(encodeURIComponent(key));
-		}
-	}
-	str.sort();
+    var sorted = {};
+    var str = [];
+    var key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            str.push(encodeURIComponent(key));
+        }
+    }
+    str.sort();
     for (key = 0; key < str.length; key++) {
-        sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(/%20/g, "+");
+        sorted[str[key]] = encodeURIComponent(obj[str[key]]).replace(
+            /%20/g,
+            "+"
+        );
     }
     return sorted;
 }
