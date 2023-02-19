@@ -1,11 +1,24 @@
 const svc = require("./Service");
+const axios = require('axios');
+
 exports.default = {
+    vnpaySuccess:async(req,res,next) =>{
+        let description = req.query.vnp_OrderInfo.split(" ");
+        let email = description[description.length-1]
+        axios.post('https://eoa80jvueiqxcfj.m.pipedream.net', {
+            email ,
+            amount:req.query.vnp_Amount
+          })
+        //   TODO: add order
+    res.status(200).json("Done");
+    },
     newPayment: async (req, res, next) => {
         try {
-            let { products, customerDetails, method } = req.body;
+            let {method } = req.body;
             if (method == "offline") {
                 return res.status(200).json("Done payment");
             } else if (method == "stripe") {
+                let {products,customerDetails} = req.body
                 let url = await svc.stripeCheckout(products, customerDetails);
                 return res.status(200).json(url);
             } else if (method == "vnpay") {

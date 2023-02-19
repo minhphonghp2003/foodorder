@@ -25,8 +25,10 @@ module.exports = new (function () {
         const createDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
         var orderId = `${hours}${minutes}${seconds}`;
-        var amount = information.amount;
-        var bankCode = information.bankCode;
+        var amount = 0;
+        for (p of information.prices) {
+            amount+= parseInt(p) 
+        }
         var orderInfo = information.orderDescription;
         var orderType = information.orderType;
         var locale = information.language;
@@ -48,9 +50,7 @@ module.exports = new (function () {
         vnp_Params["vnp_ReturnUrl"] = returnUrl;
         vnp_Params["vnp_IpAddr"] = ipAddr;
         vnp_Params["vnp_CreateDate"] = createDate;
-        // if (bankCode !== null && bankCode !== "") {
-        //     vnp_Params["vnp_BankCode"] = bankCode;
-        // }
+       
         vnp_Params = sortObject(vnp_Params);
 
         var querystring = require("qs");
