@@ -132,21 +132,7 @@ exports.default = {
         return res.status(200).json(reviews);
     },
 
-    onlPay: async (req, res, next) => {
-        let info = {
-            id: "204727",
-            name: "YOMOST Bac Ha&Viet Quat 170ml",
-            description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-            category: "beverage",
-            imageUrl: "https://momo.vn/uploads/product1.jpg",
-            manufacturer: "Vinamilk",
-            price: 11000,
-            quantity: 5,
-            unit: "hộp",
-            totalPrice: 55000,
-            taxAmount: "200",
-        };
-    },
+   
     search: async (req, res, next) => {
         try {
             let result = await svc.search(req.query);

@@ -8,7 +8,6 @@ const router = express.Router();
 router.post("/",checkAuth, upload.array("images"), ctrler.createProduct);
 router.post("/category",checkAuth,upload.single("image"),  ctrler.createCategory);
 router.post("/review",  ctrler.createReview);
-router.post("onlinepay", ctrler.onlPay)
 router.get("/", ctrler.getAllProduct);
 router.get("/review", ctrler.getReviews);
 router.get("/detail/:id", ctrler.getProduct);

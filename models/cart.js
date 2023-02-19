@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     }
     cart.init(
         {
-            quanity: {
+            quantity: {
                 type: DataTypes.INTEGER,
                 allowNull: false,
             },
