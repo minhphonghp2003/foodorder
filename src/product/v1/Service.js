@@ -6,8 +6,6 @@ const {
     product_review,
     product_category,
     reviewer,
-    addons,
-    sequelize,
     favorite,
 } = require("../../../models");
 const {
@@ -202,6 +200,12 @@ module.exports = {
         await ExtractProdImgAndFav(result, userId);
         return result;
     },
+    createFavorite: async (productId, userId) => {
+        await favorite.create({ productId, userId });
+    },
+    deleteFavorite: async (productId, userId) => {
+        await favorite.destroy({where:{ productId, userId }});
+    },
 };
 // -------------------------------------------------------------------------------
 
@@ -296,21 +300,6 @@ let updateElasticDocument = async (index, id, source, params) => {
                 // you can also use parameters
                 source,
                 params: params,
-            },
-        },
-    });
-};
-
-let updateByQueryElastic = async (index, inline, params) => {
-    await elasticNodeClient.updateByQuery({
-        index,
-        body: {
-            query: {
-                match_all: {},
-            },
-
-            script: {
-                inline: inline,
             },
         },
     });

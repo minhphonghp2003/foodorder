@@ -132,11 +132,31 @@ exports.default = {
         return res.status(200).json(reviews);
     },
 
-   
     search: async (req, res, next) => {
         try {
             let result = await svc.search(req.query);
             return res.status(200).json(result);
+        } catch (error) {
+            next(error);
+        }
+    },
+
+    createFavorite: async (req, res, next) => {
+        try {
+            let userId = req.authData.id;
+            let { productId } = req.body;
+            await svc.createFavorite(productId, userId);
+            return res.status(200).json("done");
+        } catch (error) {
+            next(error);
+        }
+    },
+    deleteFavorite: async (req, res, next) => {
+        try {
+            let userId = req.authData.id;
+            let { productId } = req.body;
+            await svc.deleteFavorite(productId, userId);
+            return res.status(200).json("done");
         } catch (error) {
             next(error);
         }
