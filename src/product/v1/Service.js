@@ -10,7 +10,6 @@ const {
     table_booking,
 } = require("../../../models");
 const {
-    elasticCloudClient,
     elasticNodeClient,
 } = require("../../../library/elastic_client");
 const { app } = require("../../../config/firebase");
