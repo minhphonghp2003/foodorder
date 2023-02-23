@@ -7,6 +7,7 @@ const {
     product_category,
     reviewer,
     favorite,
+    table_booking,
 } = require("../../../models");
 const {
     elasticCloudClient,
@@ -75,7 +76,7 @@ module.exports = {
             page,
             sort
         );
-        await ExtractProdImgAndFav(result, userId);
+        await ExtractProdImgAndFav(result.hits, userId);
         return result;
     },
 
@@ -197,15 +198,37 @@ module.exports = {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
         let result = await queryStringSearch(`*${keyword}*`, size, page, sort);
-        await ExtractProdImgAndFav(result, userId);
+        await ExtractProdImgAndFav(result.hits, userId);
         return result;
     },
-    createFavorite: async (productId, userId) => {
-        await favorite.create({ productId, userId });
+    createTable: async (information) => {
+        let table = await table_booking.create({
+            date: information.date,
+            time: information.time,
+            adult: information.adult,
+            kid: information.kid,
+            message: information.message,
+            userId:information.userId
+        });
+        return table
     },
-    deleteFavorite: async (productId, userId) => {
-        await favorite.destroy({where:{ productId, userId }});
+    getTable: async(userId) =>{
+        let tables = await table_booking.findAll({
+            where:{
+                userId
+            },
+        })
+        return tables
     },
+    deleteTable: async(userId,tableId) =>{
+        await table_booking.destroy({
+            where:{
+                userId,
+                id: tableId
+            }
+        })
+        return
+    }
 };
 // -------------------------------------------------------------------------------
 
@@ -224,7 +247,7 @@ let getRelatedProduct = async (categories) => {
 };
 
 let ExtractProdImgAndFav = async (products, userId) => {
-    for (let product of products.hits) {
+    for (let product of products) {
         product._source.images = product._source.images
             ? await getImageFromFirebase(product._source.images[0])
             : await getImageFromFirebase(

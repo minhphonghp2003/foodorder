@@ -10,36 +10,15 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      this.belongsTo(models.user)
+    this.belongsTo(models.user)
     }
   }
   table_booking.init({
-    tab_id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
-      type: DataTypes.INTEGER
-    },
-    date: {
-      allowNull: false,
-      type: DataTypes.TEXT
-    },
-
-    time: {
-      allowNull: false,
-      type: DataTypes.TEXT
-    },
-
-    message: {
-      allowNull: false,
-      type: DataTypes.TEXT
-    },
-    customerId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      
-    },
-
+    date: DataTypes.DATE,
+    time: DataTypes.TIME,
+    adult: DataTypes.INTEGER,
+    kid: DataTypes.INTEGER,
+    message: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'table_booking',

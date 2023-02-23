@@ -140,25 +140,34 @@ exports.default = {
             next(error);
         }
     },
-
-    createFavorite: async (req, res, next) => {
+    createTable: async (req, res, next) => {
         try {
             let userId = req.authData.id;
-            let { productId } = req.body;
-            await svc.createFavorite(productId, userId);
-            return res.status(200).json("done");
+            let information = req.body;
+            information.userId = userId;
+            let table = await svc.createTable(information);
+            return res.status(200).json(table)
         } catch (error) {
-            next(error);
+            next(error)
         }
     },
-    deleteFavorite: async (req, res, next) => {
+    getTables : async(req,res,next) =>{
         try {
-            let userId = req.authData.id;
-            let { productId } = req.body;
-            await svc.deleteFavorite(productId, userId);
-            return res.status(200).json("done");
+           let userId = req.authData.id 
+           let tables = await svc.getTable(userId)
+           return res.status(200).json(tables)
         } catch (error) {
-            next(error);
+           next(error) 
         }
     },
+    deleteTable: async(req,res,next) =>{
+        try {
+        let userId = req.authData.id
+        let tableId = req.body.tableId
+        await svc.deleteTable(userId,tableId)
+        return res.status(200).json("done")
+        } catch (error) {
+           next(error) 
+        }
+    }
 };
