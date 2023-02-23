@@ -40,7 +40,6 @@
     "jsonwebtoken": "^9.0.0",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "next": "^13.1.6",
     "passport": "^0.6.0",
     "passport-facebook": "^3.0.0",
     "passport-google-oidc": "^0.1.0",
