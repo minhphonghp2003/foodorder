@@ -1,7 +1,4 @@
 const jwtConf = require("../config/jwt");
-const appConf = require("../config/app");
-const AWS = require("aws-sdk");
-const s3 = new AWS.S3();
 const fs = require("fs");
 const path = require("path");
 const jwt = require("jsonwebtoken");
