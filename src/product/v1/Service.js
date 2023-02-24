@@ -141,7 +141,7 @@ module.exports = {
         });
     },
     createCategory: async (name, image) => {
-        let imageId = await createImage(image);
+        let imageId = (await createImage(image)).id;
         let categoryId = (await category.create({ name, imageId })).id;
         return categoryId;
     },

@@ -84,6 +84,7 @@ exports.default = {
             let id = await svc.createCategory(name, image);
             return res.status(200).json(id);
         } catch (error) {
+            console.log(error);
             next(error);
         }
     },
