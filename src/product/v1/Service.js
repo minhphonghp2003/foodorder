@@ -6,7 +6,6 @@ const {
     product_review,
     product_category,
     reviewer,
-    favorite,
     table_booking,
 } = require("../../../models");
 const {
@@ -75,7 +74,7 @@ module.exports = {
             page,
             sort
         );
-        await ExtractProdImgAndFav(result.hits, userId);
+        await ExtractProdImg(result.hits, userId);
         return result;
     },
 
@@ -197,7 +196,7 @@ module.exports = {
         let sort = [{}];
         sort[0][sortField] = sortDirect;
         let result = await queryStringSearch(`*${keyword}*`, size, page, sort);
-        await ExtractProdImgAndFav(result.hits, userId);
+        await ExtractProdImg(result.hits, userId);
         return result;
     },
     createTable: async (information) => {
@@ -245,18 +244,14 @@ let getRelatedProduct = async (categories) => {
     );
 };
 
-let ExtractProdImgAndFav = async (products, userId) => {
+let ExtractProdImg = async (products, userId) => {
     for (let product of products) {
         product._source.images = product._source.images
             ? await getImageFromFirebase(product._source.images[0])
             : await getImageFromFirebase(
                   "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
               );
-        if (await isFavorite(userId, product._source.id)) {
-            product._source.isFavorite = true;
-        } else {
-            product._source.isFavorite = false;
-        }
+       
     }
 };
 
@@ -327,21 +322,7 @@ let updateElasticDocument = async (index, id, source, params) => {
     });
 };
 
-let isFavorite = async (userId, productId) => {
-    if (!userId || userId == "null") {
-        return false;
-    }
-    let isExist = await favorite.findOne({
-        where: {
-            userId,
-            productId,
-        },
-    });
-    if (!isExist) {
-        return false;
-    }
-    return true;
-};
+
 
 let addProductCategory = async (productId, categories) => {
     for (cate of categories) {

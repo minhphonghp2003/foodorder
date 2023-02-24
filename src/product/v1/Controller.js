@@ -19,6 +19,7 @@ exports.default = {
             );
             return res.status(200).json(prd);
         } catch (error) {
+            console.log(error);
             next(error);
         }
     },
