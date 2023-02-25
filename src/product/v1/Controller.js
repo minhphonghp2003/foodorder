@@ -155,8 +155,7 @@ exports.default = {
     },
     getTables : async(req,res,next) =>{
         try {
-           let userId = req.authData.id 
-           let tables = await svc.getTable(userId)
+           let tables = await svc.getTable()
            return res.status(200).json(tables)
         } catch (error) {
            next(error) 
@@ -164,9 +163,12 @@ exports.default = {
     },
     deleteTable: async(req,res,next) =>{
         try {
-        let userId = req.authData.id
-        let tableId = req.body.tableId
-        await svc.deleteTable(userId,tableId)
+        let userRole = req.authData.role
+        if(userRole != "admin" && userRole != "staff" ){
+            return res.status(400).json("Not allowed")
+        }
+        let {tableId} = req.body
+        await svc.deleteTable(tableId)
         return res.status(200).json("done")
         } catch (error) {
            next(error) 

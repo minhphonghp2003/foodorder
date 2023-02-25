@@ -11,6 +11,7 @@ const { Op } = require("sequelize");
 module.exports = new (function () {
     this.updateBilling = async (value, userId, products) => {
         for (let product of products) {
+            console.log(product);
             await cart.update(
                 { billing: value },
                 {
@@ -90,7 +91,8 @@ module.exports = new (function () {
             line_items,
             customer_email: customerDetail.email,
             mode: "payment",
-            success_url: stripeConfig.success_url,
+            success_url: stripeConfig.success_url ,
+            cancel_url:stripeConfig.cancel_url
         });
         return session.url;
     }),

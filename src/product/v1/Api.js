@@ -15,7 +15,7 @@ router.post(
 );
 router.post("/review", ctrler.createReview);
 router.get("/", ctrler.getAllProduct);
-router.get("/table", checkAuth, ctrler.getTables);
+router.get("/table",  ctrler.getTables);
 router.get("/review", ctrler.getReviews);
 router.get("/detail/:id", ctrler.getProduct);
 router.get("/category/all", ctrler.getAllCategory);

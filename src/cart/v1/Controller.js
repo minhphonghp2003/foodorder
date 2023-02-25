@@ -1,42 +1,41 @@
 const svc = require("./Service");
-const axios = require('axios');
+const axios = require("axios");
+const appConf = require("../../../config/app")
 
 exports.default = {
-    vnpaySuccess:async(req,res,next) =>{
+   
+    vnpaySuccess: async (req, res, next) => {
         let description = req.query.vnp_OrderInfo.split(" ");
-        let email = description[description.length-1]
-        axios.post('https://eoa80jvueiqxcfj.m.pipedream.net', {
-            email ,
-            amount:req.query.vnp_Amount
-          })
-    res.status(200).json("Done");
+        let email = description[description.length - 1];
+        axios.post("https://eoa80jvueiqxcfj.m.pipedream.net", {
+            email,
+            amount: req.query.vnp_Amount,
+        });
+        res.redirect(appConf.webUrl);
     },
     newPayment: async (req, res, next) => {
-        let userId = req.authData.id
-        let {method, products, customerDetail } = req.body;
+        let userId = req.authData.id;
+        let { method, products, customerDetail } = req.body;
         try {
             if (method == "offline") {
-                await svc.updateBilling("unpaid",userId,products)
+                await svc.updateBilling("unpaid", userId, products);
                 return res.status(200).json("Done payment");
             } else if (method == "stripe") {
-                await svc.updateBilling("paid",userId,products)
                 let url = await svc.stripeCheckout(products, customerDetail);
                 return res.status(200).json(url);
             } else if (method == "vnpay") {
-                await svc.updateBilling("paid",userId,products)
                 var ipAddr =
                     req.headers["x-forwarded-for"] ||
                     req.connection.remoteAddress ||
                     req.socket.remoteAddress ||
-                    req.connection.socket.remoteAddress||
+                    req.connection.socket.remoteAddress ||
                     "127.0.0.1";
-                let information = {ipAddr,products, customerDetail, userId}
+                let information = { ipAddr, products, customerDetail, userId };
                 let url = await svc.vnpayCheckout(information);
                 return res.status(200).json(url);
             }
             return res.status(500).json("error");
         } catch (error) {
-            await svc.updateBilling(null,userId,products)
             next(error);
         }
     },

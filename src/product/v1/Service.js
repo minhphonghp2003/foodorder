@@ -8,9 +8,7 @@ const {
     reviewer,
     table_booking,
 } = require("../../../models");
-const {
-    elasticNodeClient,
-} = require("../../../library/elastic_client");
+const { elasticNodeClient } = require("../../../library/elastic_client");
 const { app } = require("../../../config/firebase");
 const {
     getStorage,
@@ -206,27 +204,22 @@ module.exports = {
             adult: information.adult,
             kid: information.kid,
             message: information.message,
-            userId:information.userId
+            userId: information.userId,
         });
-        return table
+        return table;
     },
-    getTable: async(userId) =>{
-        let tables = await table_booking.findAll({
-            where:{
-                userId
-            },
-        })
-        return tables
+    getTable: async () => {
+        let tables = await table_booking.findAll();
+        return tables;
     },
-    deleteTable: async(userId,tableId) =>{
+    deleteTable: async (tableId) => {
         await table_booking.destroy({
-            where:{
-                userId,
-                id: tableId
-            }
-        })
-        return
-    }
+            where: {
+                id: tableId,
+            },
+        });
+        return;
+    },
 };
 // -------------------------------------------------------------------------------
 
@@ -251,7 +244,6 @@ let ExtractProdImg = async (products, userId) => {
             : await getImageFromFirebase(
                   "foodorder/product/254824122-blue-lint-abstract-8k-5120x2880.jpg"
               );
-       
     }
 };
 
@@ -321,8 +313,6 @@ let updateElasticDocument = async (index, id, source, params) => {
         },
     });
 };
-
-
 
 let addProductCategory = async (productId, categories) => {
     for (cate of categories) {
