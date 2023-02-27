@@ -8,6 +8,8 @@ router.post("/", checkAuth, ctrler.upsertCart);
 router.post("/payment",checkAuth,ctrler.newPayment)
 router.delete("/", checkAuth, ctrler.deleteCart);
 router.get("/", checkAuth, ctrler.getCart);
-router.get("/vnpaySuccess",  ctrler.vnpaySuccess);
+router.get("/vnpaySuccess/:userId",  ctrler.vnpayPaymentSuccess);
+router.get("/stripeSuccess",  ctrler.stripePaymentSuccess);
+
 
 module.exports = router;

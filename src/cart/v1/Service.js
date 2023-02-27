@@ -7,28 +7,24 @@ const storage = getStorage(app);
 const stripe = require("stripe")(stripeConfig.sk_test);
 const { Op } = require("sequelize");
 
-
 module.exports = new (function () {
-    this.updateBilling = async (value, userId, products) => {
-        for (let product of products) {
-            console.log(product);
-            await cart.update(
-                { billing: value },
-                {
-                    where: {
-                        userId,
-                        productId: product.id,
-                    },
-                }
-            );
-        }
+    this.updateBilling = async (value, userId, productId) => {
+        await cart.update(
+            { billing: value },
+            {
+                where: {
+                    userId,
+                    productId
+                },
+            }
+        );
     };
     this.vnpayCheckout = async (information) => {
         var ipAddr = information.ipAddr;
         var tmnCode = vnpayConfig.vnp_TmnCode;
         var secretKey = vnpayConfig.vnp_HashSecret;
         var vnpUrl = vnpayConfig.vnp_Url;
-        var returnUrl = vnpayConfig.vnp_ReturnUrl;
+        var returnUrl = vnpayConfig.vnp_ReturnUrl + `/${information.customerDetail.userId}` ;
 
         const now = new Date();
         const year = now.getFullYear();
@@ -40,11 +36,14 @@ module.exports = new (function () {
         const createDate = `${year}${month}${day}${hours}${minutes}${seconds}`;
 
         var orderId = `${hours}${minutes}${seconds}`;
+
         var amount = 0;
+        let productIds = []
         for (p of information.products) {
             amount += parseInt(p.price) * parseInt(p.quantity);
+            productIds.push(p.id) 
         }
-        var orderInfo = `Customer ${information.userId} has transferred money into this account. Email ${information.customerDetail.email}`;
+        var orderInfo = `{"CustomerEmail": ${JSON.stringify(information.customerDetail.email)} ,"Products": ${JSON.stringify(productIds)} }`;
         var locale = "vn";
         var currCode = "VND";
         var vnp_Params = {};
@@ -59,6 +58,7 @@ module.exports = new (function () {
         vnp_Params["vnp_ReturnUrl"] = returnUrl;
         vnp_Params["vnp_IpAddr"] = ipAddr;
         vnp_Params["vnp_CreateDate"] = createDate;
+        
 
         vnp_Params = sortObject(vnp_Params);
 
@@ -73,7 +73,9 @@ module.exports = new (function () {
     };
     (this.stripeCheckout = async (products, customerDetail) => {
         let line_items = [];
+        let successQuery = "";
         for (let p of products) {
+            successQuery += `productId=${p.id}&`;
             line_items.push({
                 price_data: {
                     unit_amount: p.price,
@@ -85,14 +87,22 @@ module.exports = new (function () {
                 },
                 quantity: p.quantity,
             });
+            delete p.images
+            delete p.name
+            delete p.quantity
+            delete p.price
         }
 
         const session = await stripe.checkout.sessions.create({
             line_items,
             customer_email: customerDetail.email,
             mode: "payment",
-            success_url: stripeConfig.success_url ,
-            cancel_url:stripeConfig.cancel_url
+            success_url:
+                stripeConfig.success_url +
+                "?" +
+                
+               `productIds=${JSON.stringify(products)}&customer=${JSON.stringify(customerDetail)}`,
+            cancel_url: stripeConfig.cancle_url,
         });
         return session.url;
     }),
@@ -138,7 +148,7 @@ module.exports = new (function () {
                     },
                 ],
             });
-            let products = [...inCartProduct,...orderedProduct]
+            let products = [...inCartProduct, ...orderedProduct];
             for (let cart of products) {
                 cart.dataValues.product.dataValues.images =
                     await getImageFromFirebase(
@@ -147,7 +157,7 @@ module.exports = new (function () {
             }
             return {
                 inCart: inCartProduct,
-                ordered:orderedProduct
+                ordered: orderedProduct,
             };
         });
 })();

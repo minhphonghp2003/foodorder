@@ -1,11 +1,3 @@
-let obj1 = {
-    name:"obj1"
-}
-let change = (obj)=>{
-    obj = {
-        name:"obj2"
-    }
-}
-console.log(obj1);
-change(obj1)
-console.log(obj1);
+
+let str = '{"k1":"val1","k2":"val2"}'
+console.log(JSON.parse(str));
