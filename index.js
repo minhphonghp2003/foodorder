@@ -39,7 +39,7 @@ app.use("/v1/cart/", cart);
 
 app.use((err, req, res, next) => {
     res.status(400).json({error:err.stack.split(/\r?\n/)[0]});
-   res.status(400).json({error:err.stack});
+//    res.status(400).json({error:err.stack});
 });
 
 app.use((req, res, next) => {
