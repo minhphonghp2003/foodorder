@@ -3,7 +3,7 @@
 
 name: test-workflow
 
-on: [push, pull_request]
+on: [ pull_request]
 
 jobs:
   build:
@@ -30,8 +30,10 @@ jobs:
         with:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/foodorder:latest
+
+        run: exit 1
           
-  
+
 
 
 
