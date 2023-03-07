@@ -31,7 +31,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/foodorder:latest
           
-      - run: exit 1
   
 
 
