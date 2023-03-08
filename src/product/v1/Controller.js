@@ -130,8 +130,12 @@ exports.default = {
     },
 
     getReviews: async (req, res, next) => {
-        let reviews = await svc.getReviews(req.query.productId);
-        return res.status(200).json(reviews);
+        try {
+            let reviews = await svc.getReviews(req.query.productId);
+            return res.status(200).json(reviews);
+        } catch (error) {
+            next(error);
+        }
     },
 
     search: async (req, res, next) => {
@@ -148,30 +152,30 @@ exports.default = {
             let information = req.body;
             information.userId = userId;
             let table = await svc.createTable(information);
-            return res.status(200).json(table)
+            return res.status(200).json(table);
         } catch (error) {
-            next(error)
+            next(error);
         }
     },
-    getTables : async(req,res,next) =>{
+    getTables: async (req, res, next) => {
         try {
-           let tables = await svc.getTable()
-           return res.status(200).json(tables)
+            let tables = await svc.getTable();
+            return res.status(200).json(tables);
         } catch (error) {
-           next(error) 
+            next(error);
         }
     },
-    deleteTable: async(req,res,next) =>{
+    deleteTable: async (req, res, next) => {
         try {
-        let userRole = req.authData.role
-        if(userRole != "admin" && userRole != "staff" ){
-            return res.status(400).json("Not allowed")
-        }
-        let {tableId} = req.body
-        await svc.deleteTable(tableId)
-        return res.status(200).json("done")
+            let userRole = req.authData.role;
+            if (userRole != "admin" && userRole != "staff") {
+                return res.status(400).json("Not allowed");
+            }
+            let { tableId } = req.body;
+            await svc.deleteTable(tableId);
+            return res.status(200).json("done");
         } catch (error) {
-           next(error) 
+            next(error);
         }
-    }
+    },
 };
