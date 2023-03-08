@@ -1,5 +1,8 @@
 pipeline {
   agent any
+  tool {
+    nodejs 'nodejs'
+  }
   stages {
     stage('install dep') {
       parallel {
