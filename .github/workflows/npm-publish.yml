@@ -4,6 +4,8 @@
 name: test-workflow
 
 on: [ pull_request]
+env:
+  RSA_Key_Folder: /tmp/rsa
 
 jobs:
   build:
@@ -14,8 +16,9 @@ jobs:
         with:
           node-version: 16
       - run: npm i
-      - run: ls -la
-      - run: env
+      - run: |
+            ls -la
+            env
       - name: Unit testing 
         run: npm test
       -
