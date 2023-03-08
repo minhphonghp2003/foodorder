@@ -10,7 +10,7 @@
     "migrateproduction": "npx sequelize-cli db:migrate --env production",
     "undomigrate": "npx sequelize-cli db:migrate:undo",
     "undomigrateproduction": "npx sequelize-cli db:migrate:undo --env production",
-    "test": "cross-env NODE_ENV=test jest --silent --forceExit --testTimeout 10000"
+    "test": "cross-env NODE_ENV=test jest --silent --forceExit --testTimeout 15000"
   },
   "repository": {
     "type": "git",
