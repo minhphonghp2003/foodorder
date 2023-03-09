@@ -29,6 +29,6 @@ describe("Get Endpoints for product API", () => {
     });
     test(`It should response the get method for /v1/product/search`, async () => {
         let res = await request(app).get("/v1/product/search");
-        expect(res.statusCode).toEqual(300);
+        expect(res.statusCode).toEqual(200);
     });
 });
