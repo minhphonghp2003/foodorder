@@ -1,9 +1,9 @@
 pipeline {
     agent any
-//     tools {
-//   nodejs 'jenkins'
+    tools {
+  nodejs 'jenkins'
    
-// }
+}
 
     stages {
         stage('Build') {
