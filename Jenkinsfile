@@ -28,11 +28,9 @@ pipeline {
 }
             }
         }
-        stage("Deploy"){
+        stage("Re-Deploy"){
             steps{
-             
-    sh 'docker stop foodorder && docker rm foodorder'
-    sh 'docker run -dp 80:3000 --name foodorder -v $(pwd)/.env:/app/.env minhphonghp2003/foodorder:latest'
+             cp . /home/ubuntu/website/foodorder
 
             }
         }
