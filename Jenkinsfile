@@ -32,7 +32,7 @@ pipeline {
         stage("Re-Deploy"){
             steps{
               
-             sh '  rsync -a --exclude='.*' .  /home/ubuntu/website/foodorder'
+             sh '  rsync -a --exclude=".*" .  /home/ubuntu/website/foodorder'
 
             }
         }
