@@ -16,7 +16,7 @@ pipeline {
         }
         stage("Testing"){
             steps{
-               cp /home/ubuntu/.env/foodorder .env
+                sh " cp /home/ubuntu/.env/foodorder .env"
                 sh "npm test"
             }
             
