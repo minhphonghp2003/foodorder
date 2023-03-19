@@ -31,6 +31,7 @@ pipeline {
         }
         stage("Re-Deploy"){
             steps{
+             sh 'docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'
              sh 'docker stop foodorder && docker rm foodorder'
              sh 'docker run -dp 80:3000 --name foodorder -v $(pwd)/.env:/app/.env minhphonghp2003/foodorder:latest'
 
