@@ -31,8 +31,8 @@ pipeline {
         }
         stage("Re-Deploy"){
             steps{
-                sh 'id'
-             sh ' cp -r . /home/ubuntu/website/foodorder 2>/dev/null'
+              
+             sh '  rsync -a --exclude='.*' .  /home/ubuntu/website/foodorder'
 
             }
         }
