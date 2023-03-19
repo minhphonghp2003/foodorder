@@ -31,8 +31,8 @@ pipeline {
         }
         stage("Re-Deploy"){
             steps{
-              
-             sh '  rsync -a --exclude=".*" --exclude "node_modules" .  /home/ubuntu/website/foodorder'
+             sh 'docker stop foodorder && docker rm foodorder'
+             sh 'docker run -dp 80:3000 --name foodorder -v $(pwd)/.env:/app/.env minhphonghp2003/foodorder:latest'
 
             }
         }
