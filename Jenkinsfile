@@ -30,7 +30,7 @@ pipeline {
         }
         stage("Re-Deploy"){
             steps{
-             sh 'cp . /home/ubuntu/website/foodorder'
+             sh 'cp -r . /home/ubuntu/website/foodorder'
 
             }
         }
