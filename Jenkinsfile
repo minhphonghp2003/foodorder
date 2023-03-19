@@ -34,7 +34,7 @@ pipeline {
             
              sh 'docker stop foodorder && docker rm foodorder'
                 sh 'docker rmi $(docker images --filter "dangling=true" -q --no-trunc)'
-             sh 'docker run -dp 80:3000 --name foodorder -v $(pwd)/.env:/app/.env minhphonghp2003/foodorder:latest'
+             sh 'docker run -dp 80:3000 --name foodorder -v /home/ubuntu/.env/foodorder:/app/.env minhphonghp2003/foodorder:latest'
 
             }
         }
