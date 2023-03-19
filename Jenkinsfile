@@ -20,12 +20,20 @@ pipeline {
             }
             
         }
-        stage("Deploy"){
+        stage("Push to Dockerhub"){
             steps{
              withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
     sh 'docker build -t minhphonghp2003/foodorder:latest .'
     sh 'docker push minhphonghp2003/foodorder:latest'
 }
+            }
+        }
+        stage("Deploy"){
+            steps{
+             
+    sh 'docker stop foodorder && docker rm foodorder'
+    sh 'docker run -dp 80:3000 --name foodorder -v $(pwd)/.env:/app/.env minhphonghp2003/foodorder:latest'
+
             }
         }
     }
