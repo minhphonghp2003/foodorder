@@ -16,7 +16,7 @@ pipeline {
         }
         stage("Testing"){
             steps{
-                sh"pwd"
+               
                 sh "npm test"
             }
             
@@ -31,7 +31,7 @@ pipeline {
         }
         stage("Re-Deploy"){
             steps{
-             sh 'cp -r . /home/ubuntu/website/foodorder'
+             sh ' cp -r . /home/ubuntu/website/foodorder 2>/dev/null'
 
             }
         }
